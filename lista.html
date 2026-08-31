@@ -155,8 +155,9 @@ async function entrar(){
   clave = $("clave").value.trim(); $("loginErr").textContent = "";
   $("entrar").disabled = true; $("entrar").textContent = "Verificando…";
   try {
+    const ok = await rpc("clave_ok", {});
+    if (!ok){ $("loginErr").textContent = "Clave incorrecta. Revisa mayúsculas y minúsculas."; sessionStorage.removeItem("clave"); $("entrar").disabled=false; $("entrar").textContent="Entrar"; return; }
     await cargarTodo();
-    if (!conf.length && !inv.length){ $("loginErr").textContent = "Sin registros aún, o la clave no es correcta."; }
     sessionStorage.setItem("clave", clave); mostrar();
   } catch(e){ $("loginErr").textContent = "No se pudo conectar. Revisa que ejecutaste supabase-lista.sql y supabase-invitados.sql."; console.error(e); }
   $("entrar").disabled = false; $("entrar").textContent = "Entrar";
