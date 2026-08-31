@@ -71,6 +71,14 @@
   .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--musgo);color:var(--crudo);padding:10px 16px;border-radius:999px;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none;z-index:9}
   .toast.show{opacity:1}
   .fab{position:fixed;right:16px;bottom:16px;z-index:8;box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
+  .gridcats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  .catcard{background:#fff;border:1px solid var(--arena);border-radius:18px;padding:16px 14px;cursor:pointer;text-align:left;font:inherit}
+  .catcard .emo{font-size:1.9rem;line-height:1}
+  .catcard .cn{font-family:Fraunces,serif;font-weight:600;color:var(--musgo);font-size:1.05rem;margin:8px 0 2px;line-height:1.1}
+  .catcard .cm{font-size:.74rem;color:#5a6656}
+  .catcard .cv{font-family:Fraunces,serif;font-weight:600;color:var(--musgo);margin-top:8px}
+  .catcard .cs{font-size:.72rem;font-weight:700} .catcard .cs.neg{color:var(--rojo)} .catcard .cs.ok{color:var(--hoja)}
+  .volver{display:inline-flex;align-items:center;gap:6px;margin:2px 0 10px;padding:8px 14px;border-radius:999px;border:1px solid var(--arena);background:#fff;font:inherit;font-weight:700;color:var(--musgo);cursor:pointer;font-size:.82rem}
   .cat{font-family:Fraunces,serif;font-weight:600;color:var(--musgo);font-size:1.05rem;margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
   .cat small{font-family:Karla;font-size:.75rem;color:#5a6656;font-weight:400}
 </style>
@@ -222,6 +230,8 @@ const num = s => +String(s||"").replace(/[^\d]/g,"") || 0;
 function toast(t){ const x=$("toast"); x.textContent=t; x.classList.add("show"); setTimeout(()=>x.classList.remove("show"),1800); }
 
 let clave = sessionStorage.getItem("clave") || "", famId = +sessionStorage.getItem("famId") || 1;
+const ICONO = {"Lugar":"🏡","Programa":"🎉","Almuerzo":"🍽️","Niños":"🧒","Mesa de dulces":"🍰","Decoración":"✨","Logística":"🪑","Otros":"📌"};
+let catSel = null;
 let conf=[], inv=[], familias=[], gastos=[], abonos=[], fConf="si", fInv="todos", fPlan="todos", abierto=null;
 
 async function rpc(fn, args){ const {data, error} = await sb.rpc(fn, {clave, ...args}); if (error) throw error; return data; }
@@ -300,15 +310,33 @@ function pintarPlan(){
     `<tr><td><b>Total</b></td><td class="r"><b>${personasTotal()}</b></td><td class="r"><b>${cop(tot)}</b></td><td class="r"><b>${cop(ab)}</b></td><td class="r"><b>${cop(tot-ab)}</b></td></tr>`;
 
   pintarAportes();
+  // Tablero de cuadraditos por categoría; con un filtro activo o una categoría abierta, muestra la lista
+  if (catSel === null && fPlan === "todos"){
+    $("listaPlan").innerHTML = `<div class="gridcats">` + CATS.map(c => {
+      const grupo = gastos.filter(g=>g.categoria===c); if(!grupo.length) return "";
+      const act = grupo.filter(g=>g.estado!=="cancelado");
+      const t = act.reduce((s,g)=>s+totalGasto(g),0), a = act.reduce((s,g)=>s+abonadoGasto(g),0);
+      const pend = grupo.filter(g=>g.estado==="pendiente").length;
+      return `<button class="catcard" data-cat="${c}">
+        <div class="emo">${ICONO[c]||"📌"}</div>
+        <div class="cn">${c}</div>
+        <div class="cm">${grupo.length} ítem${grupo.length!==1?"s":""}${pend?` · ${pend} pendiente${pend!==1?"s":""}`:""}</div>
+        <div class="cv">${cop(t)}</div>
+        <div class="cs ${t-a>0.5?"neg":"ok"}">${t-a>0.5?"Saldo "+cop(t-a):"Al día"}</div>
+      </button>`; }).join("") + `</div>`;
+    return;
+  }
   let lista = gastos.filter(g =>
-    fPlan==="todos" || (fPlan==="mias" && norm(g.encargado)===norm(mi.nombre)) || (fPlan==="pend" && g.estado==="pendiente") ||
-    (fPlan==="saldo" && g.estado!=="cancelado" && totalGasto(g)-abonadoGasto(g)>0.5) || (fPlan==="prox" && g.fecha_entrega && diasPara(g.fecha_entrega)<=7 && g.estado!=="entregado" && g.estado!=="cancelado"));
-  if(!lista.length){ $("listaPlan").innerHTML = `<div class="empty">Nada en esta vista.</div>`; return; }
-  let html = "";
+    (catSel===null || g.categoria===catSel) &&
+    (fPlan==="todos" || (fPlan==="mias" && norm(g.encargado)===norm(mi.nombre)) || (fPlan==="pend" && g.estado==="pendiente") ||
+    (fPlan==="saldo" && g.estado!=="cancelado" && totalGasto(g)-abonadoGasto(g)>0.5) || (fPlan==="prox" && g.fecha_entrega && diasPara(g.fecha_entrega)<=7 && g.estado!=="entregado" && g.estado!=="cancelado")));
+  const volver = `<button class="volver" id="volverCats">← Categorías</button>`;
+  if(!lista.length){ $("listaPlan").innerHTML = volver + `<div class="empty">Nada en esta vista.</div>`; return; }
+  let html = volver;
   for (const c of CATS){
     const grupo = lista.filter(g=>g.categoria===c); if(!grupo.length) continue;
     const st = grupo.filter(g=>g.estado!=="cancelado").reduce((s,g)=>s+totalGasto(g),0);
-    html += `<div class="cat">${c}<small>${cop(st)}</small></div>` + grupo.map(tarjetaGasto).join("");
+    html += `<div class="cat">${ICONO[c]||""} ${c}<small>${cop(st)}</small></div>` + grupo.map(tarjetaGasto).join("");
   }
   $("listaPlan").innerHTML = html;
 }
@@ -339,7 +367,7 @@ function tarjetaGasto(g){
     <div class="acts"><span class="meta">A ${esc(mi.nombre)} le toca <b>${cop(parteFam(g,mi))}</b></span><button class="lnk" data-open="${g.id}">${abierto===g.id?"Cerrar":"Detalle · abonos"}</button></div>
     ${det}</div>`;
 }
-$("filtroPlan").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fPlan=b.dataset.f;
+$("filtroPlan").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fPlan=b.dataset.f; if(fPlan!=="todos") catSel=null;
   $("filtroPlan").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintarPlan(); };
 $("tablaFam").addEventListener("click", async e => {
   const b = e.target.closest("[data-usar]"); if(!b) return;
@@ -361,6 +389,8 @@ $("tablaFam").addEventListener("change", async e => {
 });
 $("listaPlan").addEventListener("click", async e => {
   const t = e.target.closest("button"); if(!t) return;
+  if (t.dataset.cat){ catSel = t.dataset.cat; abierto = null; pintarPlan(); window.scrollTo({top:$("listaPlan").offsetTop-70, behavior:"smooth"}); return; }
+  if (t.id === "volverCats"){ catSel = null; fPlan = "todos"; $("filtroPlan").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel", x.dataset.f==="todos")); pintarPlan(); return; }
   if (t.dataset.open){ abierto = abierto===+t.dataset.open ? null : +t.dataset.open; pintarPlan(); return; }
   if (t.dataset.edit){ editarGasto(gastos.find(g=>g.id===+t.dataset.edit)); return; }
   if (t.dataset.del){ if(!confirm(`¿Eliminar "${t.dataset.n}" y sus abonos?`)) return;
@@ -375,7 +405,7 @@ $("listaPlan").addEventListener("click", async e => {
 /* ----- formulario gasto ----- */
 function abrirForm(){ $("formGasto").classList.remove("hide"); $("formGasto").scrollIntoView({behavior:"smooth",block:"start"}); }
 function limpiarForm(){ ["gId","gNombre","gValor","gFecha","gProv","gCont","gEnc","gNotas"].forEach(i=>$(i).value=""); $("gCat").value="Otros"; $("gTipo").value="comun"; $("gEstado").value="pendiente"; $("formTitulo").textContent="Nuevo gasto o tarea"; }
-$("fabNuevo").onclick = () => { limpiarForm(); abrirForm(); };
+$("fabNuevo").onclick = () => { limpiarForm(); if(catSel) $("gCat").value = catSel; abrirForm(); };
 $("gCancelar").onclick = () => $("formGasto").classList.add("hide");
 $("gTipo").onchange = () => $("lblValor").textContent = $("gTipo").value==="unitario" ? "Valor por persona" : "Valor total";
 $("gValor").addEventListener("blur", () => { const v=num($("gValor").value); $("gValor").value = v ? cop(v) : ""; });
