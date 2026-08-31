@@ -4,64 +4,82 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Panel · Primera Comunión</title>
+<title>Primera Comunión · Panel de las familias</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{--musgo:#2F4A2E;--hoja:#6B8F5E;--salvia:#A9BE9A;--beige:#EFE6D3;--arena:#D9C9A6;--crudo:#FBF8F1;--oro:#B8955A;--tinta:#1F2A1E;--rojo:#8a3b2a}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Karla,system-ui,sans-serif;background:var(--crudo);color:var(--tinta);line-height:1.45}
-  .wrap{width:min(100%,600px);margin:0 auto;padding:22px 18px 80px}
-  h1{font-family:Fraunces,serif;font-weight:600;color:var(--musgo);font-size:1.7rem;line-height:1.1}
+  .wrap{width:min(100%,640px);margin:0 auto;padding:20px 16px 90px}
+  h1{font-family:Fraunces,serif;font-weight:600;color:var(--musgo);font-size:1.6rem;line-height:1.1}
   .sub{font-family:Fraunces,serif;font-style:italic;font-weight:300;color:#5a6656;margin-top:4px}
-  .k{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--hoja);font-weight:700}
-  input,textarea{width:100%;padding:12px 14px;border:1px solid var(--arena);border-radius:12px;background:#fff;font:inherit;font-size:1rem}
-  textarea{min-height:110px;resize:vertical}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:999px;border:1px solid var(--musgo);background:var(--musgo);color:var(--crudo);font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;text-decoration:none}
-  .btn.ghost{background:transparent;color:var(--musgo)}
-  .btn.sm{padding:8px 12px;font-size:.8rem}
-  .btn[disabled]{opacity:.6}
+  .k{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--hoja);font-weight:700}
+  input,textarea,select{width:100%;padding:11px 13px;border:1px solid var(--arena);border-radius:12px;background:#fff;font:inherit;font-size:1rem;color:var(--tinta)}
+  textarea{min-height:90px;resize:vertical}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:999px;border:1px solid var(--musgo);background:var(--musgo);color:var(--crudo);font:inherit;font-weight:700;font-size:.88rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn.ghost{background:transparent;color:var(--musgo)} .btn.gold{background:var(--oro);border-color:var(--oro);color:#fff}
+  .btn.sm{padding:8px 12px;font-size:.78rem} .btn[disabled]{opacity:.6}
   .login{margin-top:40px;background:var(--beige);border-radius:20px;padding:22px}
   .login .btn{width:100%;margin-top:14px}
   .err{color:var(--rojo);font-size:.9rem;margin-top:10px}
-  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0 6px;background:var(--beige);padding:5px;border-radius:999px}
-  .tabs button{padding:11px;border-radius:999px;border:0;background:transparent;font:inherit;font-weight:700;color:var(--musgo);cursor:pointer}
+  .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:16px 0 8px;background:var(--beige);padding:5px;border-radius:999px}
+  .tabs button{padding:10px 4px;border-radius:999px;border:0;background:transparent;font:inherit;font-weight:700;color:var(--musgo);cursor:pointer;font-size:.9rem}
   .tabs button.sel{background:var(--musgo);color:var(--crudo)}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
-  .stat{background:var(--beige);border-radius:14px;padding:12px 6px;text-align:center}
-  .stat b{display:block;font-family:Fraunces,serif;font-weight:600;font-size:1.8rem;color:var(--musgo);line-height:1}
-  .stat small{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hoja);font-weight:700}
+  .fams{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}
+  .fams .k{margin-right:4px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+  .stats.three{grid-template-columns:repeat(3,1fr)}
+  .stat{background:var(--beige);border-radius:14px;padding:11px 6px;text-align:center}
+  .stat b{display:block;font-family:Fraunces,serif;font-weight:600;font-size:1.05rem;color:var(--musgo);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat small{display:block;margin-top:4px;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--hoja);font-weight:700}
   .stat.total{background:var(--musgo)} .stat.total b,.stat.total small{color:var(--beige)}
-  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 14px}
+  .stat.alert b{color:var(--rojo)}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 12px}
   .chips{display:flex;gap:6px;flex:1;flex-wrap:wrap}
-  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--arena);background:#fff;font:inherit;font-size:.8rem;font-weight:700;color:var(--musgo);cursor:pointer}
+  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--arena);background:#fff;font:inherit;font-size:.78rem;font-weight:700;color:var(--musgo);cursor:pointer}
   .chip.sel{background:var(--musgo);color:var(--crudo);border-color:var(--musgo)}
+  .chip.gold.sel{background:var(--oro);border-color:var(--oro)}
   .card{background:#fff;border:1px solid var(--arena);border-radius:16px;padding:14px 16px;margin-bottom:10px}
-  .card.no{opacity:.75;background:var(--beige)}
+  .card.no{opacity:.75;background:var(--beige)} .card.done{border-color:var(--salvia);background:#f6f9f3}
   .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-  .name{font-family:Fraunces,serif;font-weight:600;font-size:1.12rem;color:var(--musgo)}
-  .pill{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--salvia);color:var(--musgo);white-space:nowrap}
-  .pill.no{background:var(--arena)} .pill.wait{background:#fff;border:1px solid var(--arena);color:#5a6656} .pill.gold{background:var(--oro);color:#fff}
-  .meta{font-size:.85rem;color:#5a6656;margin-top:4px}
+  .name{font-family:Fraunces,serif;font-weight:600;font-size:1.1rem;color:var(--musgo);line-height:1.15}
+  .pill{font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--salvia);color:var(--musgo);white-space:nowrap}
+  .pill.no{background:var(--arena)} .pill.wait{background:#fff;border:1px solid var(--arena);color:#5a6656} .pill.gold{background:var(--oro);color:#fff} .pill.red{background:#f1d9d3;color:var(--rojo)} .pill.soft{background:var(--beige);color:#5a6656}
+  .meta{font-size:.84rem;color:#5a6656;margin-top:5px}
   .meta a{color:var(--musgo);font-weight:700;text-decoration:none}
-  .msg{margin-top:8px;font-family:Fraunces,serif;font-style:italic;color:#3f4a3c;border-left:3px solid var(--oro);padding-left:10px}
-  .acts{margin-top:10px;display:flex;gap:14px;justify-content:flex-end;align-items:center}
-  .del{background:transparent;border:0;color:var(--rojo);font:inherit;font-size:.78rem;cursor:pointer;text-decoration:underline}
-  .check{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:700;color:var(--musgo);cursor:pointer;user-select:none}
+  .money{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;background:var(--beige);border-radius:12px;padding:8px}
+  .money div{text-align:center} .money b{display:block;font-family:Fraunces,serif;font-weight:600;color:var(--musgo);font-size:1.05rem} .money small{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--hoja);font-weight:700}
+  .money .neg b{color:var(--rojo)} .money .ok b{color:var(--hoja)}
+  .acts{margin-top:10px;display:flex;gap:12px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+  .lnk{background:transparent;border:0;color:var(--musgo);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
+  .lnk.del{color:var(--rojo);font-weight:400}
+  .check{display:flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:var(--musgo);cursor:pointer;user-select:none}
   .check input{width:20px;height:20px;accent-color:var(--musgo);padding:0}
-  .empty{text-align:center;color:#5a6656;padding:40px 0;font-family:Fraunces,serif;font-style:italic}
-  .add{background:var(--beige);border-radius:18px;padding:16px;margin:0 0 14px}
-  .add .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-  .add .btn{margin-top:10px}
-  .toggle{background:transparent;border:0;color:var(--musgo);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;font-size:.85rem}
+  .empty{text-align:center;color:#5a6656;padding:36px 0;font-family:Fraunces,serif;font-style:italic}
+  .box{background:var(--beige);border-radius:18px;padding:14px 16px;margin:0 0 12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+  .box label{display:block;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--hoja);font-weight:700;margin:10px 0 4px}
+  .box .btn{margin-top:12px}
+  .det{margin-top:10px;border-top:1px dashed var(--arena);padding-top:10px}
+  table.t{width:100%;border-collapse:collapse;font-size:.84rem}
+  table.t th{text-align:left;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hoja);padding:4px 6px;border-bottom:1px solid var(--arena)}
+  table.t td{padding:6px 4px;border-bottom:1px solid #f0ebe0;font-size:.8rem} table.t td.r,table.t th.r{text-align:right;white-space:nowrap}
+  table.t tr.me td{background:#f3f6ef;font-weight:700}
+  .fam-personas{width:54px;padding:6px 4px;text-align:center;border-radius:8px}
   .hide{display:none}
-  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--musgo);color:var(--crudo);padding:10px 16px;border-radius:999px;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--musgo);color:var(--crudo);padding:10px 16px;border-radius:999px;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none;z-index:9}
   .toast.show{opacity:1}
+  .fab{position:fixed;right:16px;bottom:16px;z-index:8;box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
+  .cat{font-family:Fraunces,serif;font-weight:600;color:var(--musgo);font-size:1.05rem;margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+  .cat small{font-family:Karla;font-size:.75rem;color:#5a6656;font-weight:400}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Panel de la Primera Comunión</h1>
-  <div class="sub">Juan Alejandro y Juan Ángel · 19 de septiembre</div>
+  <h1>Primera Comunión · 19 de septiembre de 2026</h1>
+  <div class="sub">Juan Alejandro y Juan Ángel Ospina · María Lucía Guevara Cardoso · Juan Esteban y Pablo Emilio Sánchez Robayo</div>
+  <div class="k" style="margin-top:6px">Panel de las familias Ospina, Guevara y Sánchez</div>
 
   <div class="login" id="login">
     <div class="k">Clave de acceso</div>
@@ -71,20 +89,76 @@
   </div>
 
   <div id="panel" class="hide">
-    <div class="tabs"><button class="sel" data-tab="inv">Invitados</button><button data-tab="conf">Confirmaciones</button></div>
+    <div class="tabs"><button class="sel" data-tab="plan">Plan</button><button data-tab="inv">Invitados</button><button data-tab="conf">Confirmaciones</button></div>
+    <div class="fams"><span class="k">Soy la familia</span><div id="famChips" class="chips"></div></div>
+
+    <!-- ================= PLAN ================= -->
+    <div id="tabPlan">
+      <div class="stats" id="statsPlan"></div>
+      <div class="box">
+        <div class="k">Reparto por familia</div>
+        <div style="overflow-x:auto;margin-top:8px"><table class="t" id="tablaFam"></table></div>
+        <div class="meta" style="margin-top:8px">"Invitados" es el número de personas que trae cada familia; con él se reparten los gastos por invitado. Escríbelo a mano o toca <b>usar confirmados</b> para tomarlo de las confirmaciones.</div>
+      </div>
+      <div class="box">
+        <div class="row" style="align-items:center"><div class="k">Historial de aportes · quién ha pagado qué</div><button class="lnk" id="verAportes">Ver</button></div>
+        <div id="aportes" class="hide" style="margin-top:8px"></div>
+      </div>
+
+      <div class="box hide" id="formGasto">
+        <div class="k" id="formTitulo">Nuevo gasto o tarea</div>
+        <input type="hidden" id="gId">
+        <label>Nombre</label><input id="gNombre" placeholder="Ej. Lechona">
+        <div class="grid2">
+          <div><label>Categoría</label><select id="gCat"></select></div>
+          <div><label>Cómo se reparte</label><select id="gTipo">
+            <option value="comun">Común · partes iguales</option>
+            <option value="invitados">Total repartido según invitados</option>
+            <option value="unitario">Valor por persona × invitados</option></select></div>
+        </div>
+        <div class="grid2">
+          <div><label id="lblValor">Valor total</label><input id="gValor" inputmode="numeric" placeholder="$ 0"></div>
+          <div><label>Fecha de entrega / pago</label><input id="gFecha" type="date"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Proveedor</label><input id="gProv" placeholder="Quién lo vende / hace"></div>
+          <div><label>Contacto (celular)</label><input id="gCont" inputmode="tel" placeholder="3xx xxx xxxx"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Encargado</label><input id="gEnc" list="encargados" placeholder="Familia o persona"><datalist id="encargados"></datalist></div>
+          <div><label>Estado</label><select id="gEstado">
+            <option value="pendiente">Pendiente</option><option value="contratado">Contratado / apartado</option><option value="entregado">Entregado / listo</option><option value="cancelado">Cancelado</option></select></div>
+        </div>
+        <label>Notas</label><textarea id="gNotas" placeholder="Detalles, cantidades, condiciones…"></textarea>
+        <div style="display:flex;gap:8px"><button class="btn" id="gGuardar">Guardar</button><button class="btn ghost" id="gCancelar">Cancelar</button></div>
+      </div>
+
+      <div class="bar">
+        <div class="chips" id="filtroPlan">
+          <button class="chip sel" data-f="todos">Todo</button>
+          <button class="chip gold" data-f="mias">Mis tareas</button>
+          <button class="chip" data-f="pend">Pendientes</button>
+          <button class="chip" data-f="saldo">Con saldo</button>
+          <button class="chip" data-f="prox">Próximos 7 días</button>
+        </div>
+        <button class="btn ghost sm" id="pdfPlan">PDF plan</button>
+        <button class="btn ghost sm" id="pdfFam">PDF mi familia</button>
+      </div>
+      <div id="listaPlan"></div>
+    </div>
 
     <!-- ================= INVITADOS ================= -->
-    <div id="tabInv">
+    <div id="tabInv" class="hide">
       <div class="stats" id="statsInv"></div>
-      <div class="add">
-        <div class="k">Agregar invitado</div>
-        <div class="grid">
+      <div class="box">
+        <div class="k">Agregar invitado de <span id="famNombreInv"></span></div>
+        <div class="grid2">
           <input id="nuevoNombre" placeholder="Nombre y apellido">
           <input id="nuevoTel" placeholder="Celular (opcional)" inputmode="tel">
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <button class="btn sm" id="agregar">Agregar</button>
-          <button class="toggle" id="verImportar">Pegar una lista completa</button>
+          <button class="lnk" id="verImportar">Pegar una lista completa</button>
         </div>
         <div id="importar" class="hide" style="margin-top:12px">
           <div class="k">Un invitado por línea · "Nombre, celular" (el celular es opcional)</div>
@@ -107,6 +181,11 @@
 
     <!-- ================= CONFIRMACIONES ================= -->
     <div id="tabConf" class="hide">
+      <div class="box">
+        <div class="k">Totales de las tres familias</div>
+        <div style="overflow-x:auto;margin-top:8px"><table class="t" id="tablaConfTot"></table></div>
+      </div>
+      <div class="meta" style="margin:0 0 6px" id="confTitulo"></div>
       <div class="stats" id="statsConf"></div>
       <div class="bar">
         <div class="chips" id="filtroConf">
@@ -121,6 +200,7 @@
     </div>
   </div>
 </div>
+<button class="btn gold fab hide" id="fabNuevo">+ Nuevo gasto / tarea</button>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -130,25 +210,27 @@
 const SUPABASE_URL = "https://valyttwwcrsuwtwhnmez.supabase.co";
 const SUPABASE_KEY = "sb_publishable__flMBX4HygEUQ2C_nVRm4Q_b6olRccY";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const CATS = ["Lugar","Programa","Almuerzo","Niños","Mesa de dulces","Decoración","Logística","Otros"];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fecha = iso => new Date(iso).toLocaleString("es-CO",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",timeZone:"America/Bogota"});
+const fd = d => d ? new Date(d+"T12:00:00").toLocaleDateString("es-CO",{day:"numeric",month:"short"}) : "";
 const dig = t => String(t ?? "").replace(/\D/g,"").slice(-10);
 const norm = t => String(t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+const cop = n => "$ " + Math.round(n||0).toLocaleString("es-CO");
+const num = s => +String(s||"").replace(/[^\d]/g,"") || 0;
 function toast(t){ const x=$("toast"); x.textContent=t; x.classList.add("show"); setTimeout(()=>x.classList.remove("show"),1800); }
 
-let clave = sessionStorage.getItem("clave") || "", conf = [], inv = [], fConf = "si", fInv = "todos";
+let clave = sessionStorage.getItem("clave") || "", famId = +sessionStorage.getItem("famId") || 1;
+let conf=[], inv=[], familias=[], gastos=[], abonos=[], fConf="si", fInv="todos", fPlan="todos", abierto=null;
 
 async function rpc(fn, args){ const {data, error} = await sb.rpc(fn, {clave, ...args}); if (error) throw error; return data; }
-async function cargarTodo(){ [conf, inv] = await Promise.all([rpc("listar_confirmaciones",{}), rpc("listar_invitados",{})]); }
-
-/* ---------- cruce invitado ↔ confirmación ---------- */
-function confirmacionDe(i){
-  const tel = dig(i.telefono), nom = norm(i.nombre);
-  return conf.find(c => (tel && dig(c.telefono) === tel)) ||
-         conf.find(c => norm(c.nombre) === nom) ||
-         conf.find(c => nom.length > 6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre))));
+async function cargarTodo(){
+  const [c, i, p] = await Promise.all([rpc("listar_confirmaciones",{}), rpc("listar_invitados",{}), rpc("plan_listar",{})]);
+  conf=c||[]; inv=i||[]; familias=p?.familias||[]; gastos=p?.gastos||[]; abonos=p?.abonos||[];
 }
+const fam = id => familias.find(f=>f.id===id) || {nombre:"?",personas:0};
+const miFam = () => fam(famId);
 
 /* ---------- login ---------- */
 async function entrar(){
@@ -156,93 +238,250 @@ async function entrar(){
   $("entrar").disabled = true; $("entrar").textContent = "Verificando…";
   try {
     const ok = await rpc("clave_ok", {});
-    if (!ok){ $("loginErr").textContent = "Clave incorrecta. Revisa mayúsculas y minúsculas."; sessionStorage.removeItem("clave"); $("entrar").disabled=false; $("entrar").textContent="Entrar"; return; }
-    await cargarTodo();
-    sessionStorage.setItem("clave", clave); mostrar();
-  } catch(e){ $("loginErr").textContent = "No se pudo conectar. Revisa que ejecutaste supabase-lista.sql y supabase-invitados.sql."; console.error(e); }
+    if (!ok){ $("loginErr").textContent = "Clave incorrecta. Revisa mayúsculas y minúsculas."; sessionStorage.removeItem("clave"); }
+    else { await cargarTodo(); sessionStorage.setItem("clave", clave); mostrar(); }
+  } catch(e){ $("loginErr").textContent = "No se pudo conectar. Revisa que ejecutaste supabase-plan.sql."; console.error(e); }
   $("entrar").disabled = false; $("entrar").textContent = "Entrar";
 }
 $("entrar").onclick = entrar; $("clave").addEventListener("keydown", e => e.key==="Enter" && entrar());
 if (clave){ $("clave").value = clave; entrar(); }
 
-function mostrar(){ $("login").classList.add("hide"); $("panel").classList.remove("hide"); pintarInv(); pintarConf(); }
+function mostrar(){
+  $("login").classList.add("hide"); $("panel").classList.remove("hide"); $("fabNuevo").classList.remove("hide");
+  $("gCat").innerHTML = CATS.map(c=>`<option>${c}</option>`).join("");
+  $("encargados").innerHTML = familias.map(f=>`<option value="${esc(f.nombre)}">`).join("");
+  pintarFams(); pintarPlan(); pintarInv(); pintarConf();
+}
+function pintarFams(){
+  $("famChips").innerHTML = familias.map(f=>`<button class="chip ${f.id===famId?"sel":""}" data-id="${f.id}">${esc(f.nombre)}</button>`).join("");
+  $("famNombreInv").textContent = miFam().nombre;
+}
+$("famChips").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; famId=+b.dataset.id; sessionStorage.setItem("famId",famId); pintarFams(); pintarPlan(); pintarInv(); pintarConf(); };
 
 /* ---------- pestañas ---------- */
 document.querySelector(".tabs").onclick = e => { const b=e.target.closest("button"); if(!b) return;
   document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("sel",x===b));
-  $("tabInv").classList.toggle("hide", b.dataset.tab!=="inv"); $("tabConf").classList.toggle("hide", b.dataset.tab!=="conf"); };
+  ["plan","inv","conf"].forEach(t => $("tab"+t[0].toUpperCase()+t.slice(1)).classList.toggle("hide", b.dataset.tab!==t));
+  $("fabNuevo").classList.toggle("hide", b.dataset.tab!=="plan"); };
+
+/* ================= PLAN: cálculos ================= */
+const personasTotal = () => familias.reduce((a,f)=>a+(+f.personas||0),0);
+function totalGasto(g){ return g.tipo==="unitario" ? +g.valor*personasTotal() : +g.valor; }
+function parteFam(g, f){
+  const P = personasTotal(), n = familias.length || 1;
+  if (g.tipo==="comun") return +g.valor/n;
+  if (g.tipo==="invitados") return P ? +g.valor*(+f.personas||0)/P : +g.valor/n;
+  return +g.valor*(+f.personas||0);
+}
+const abonadoGasto = g => abonos.filter(a=>a.gasto_id===g.id).reduce((s,a)=>s+ +a.valor,0);
+const abonadoFam = (g,f) => abonos.filter(a=>a.gasto_id===g.id && a.familia_id===f.id).reduce((s,a)=>s+ +a.valor,0);
+const activos = () => gastos.filter(g=>g.estado!=="cancelado");
+function confirmadosFam(f){   // personas confirmadas: respuestas web de esa familia + confirmaciones manuales de su lista
+  const web = conf.filter(c=>c.asiste && (c.familia_id||1)===f.id);
+  const ad = web.reduce((s,c)=>s+ +c.adultos,0), ni = web.reduce((s,c)=>s+ +c.ninos,0);
+  const man = inv.filter(i=>i.familia_id===f.id && i.confirmado===true).reduce((s,i)=>s+(+i.personas||1),0);
+  return {familias:web.length, adultos:ad, ninos:ni, manual:man, personas:ad+ni+man};
+}
+function diasPara(d){ if(!d) return null; return Math.ceil((new Date(d+"T12:00:00") - new Date().setHours(12,0,0,0))/864e5); }
+
+function pintarPlan(){
+  const act = activos(), tot = act.reduce((s,g)=>s+totalGasto(g),0), ab = act.reduce((s,g)=>s+abonadoGasto(g),0);
+  const mi = miFam(), miTot = act.reduce((s,g)=>s+parteFam(g,mi),0), miAb = act.reduce((s,g)=>s+abonadoFam(g,mi),0);
+  $("statsPlan").innerHTML = `
+    <div class="stat total"><b>${cop(tot)}</b><small>Total evento</small></div>
+    <div class="stat"><b>${cop(ab)}</b><small>Abonado</small></div>
+    <div class="stat ${tot-ab>0?"alert":""}"><b>${cop(tot-ab)}</b><small>Saldo</small></div>
+    <div class="stat"><b>${cop(miTot-miAb)}</b><small>Mi saldo</small></div>`;
+  $("tablaFam").innerHTML = `<tr><th>Familia</th><th class="r">Invitados</th><th class="r">Le toca</th><th class="r">Abonó</th><th class="r">Saldo</th></tr>` +
+    familias.map(f => { const t=act.reduce((s,g)=>s+parteFam(g,f),0), a=act.reduce((s,g)=>s+abonadoFam(g,f),0);
+      return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}<br><small style="color:#5a6656;font-weight:400">${f.ninos} niño${f.ninos!==1?"s":""} · ${inv.filter(i=>i.familia_id===f.id).length} en lista</small></td>
+        <td class="r"><input class="fam-personas" data-id="${f.id}" value="${f.personas}" inputmode="numeric"><br><button class="lnk" data-usar="${f.id}" style="font-size:.66rem">usar confirmados (${confirmadosFam(f).personas})</button></td>
+        <td class="r">${cop(t)}</td><td class="r">${cop(a)}</td><td class="r" style="color:${t-a>0?"var(--rojo)":"var(--hoja)"}">${cop(t-a)}</td></tr>`; }).join("") +
+    `<tr><td><b>Total</b></td><td class="r"><b>${personasTotal()}</b></td><td class="r"><b>${cop(tot)}</b></td><td class="r"><b>${cop(ab)}</b></td><td class="r"><b>${cop(tot-ab)}</b></td></tr>`;
+
+  pintarAportes();
+  let lista = gastos.filter(g =>
+    fPlan==="todos" || (fPlan==="mias" && norm(g.encargado)===norm(mi.nombre)) || (fPlan==="pend" && g.estado==="pendiente") ||
+    (fPlan==="saldo" && g.estado!=="cancelado" && totalGasto(g)-abonadoGasto(g)>0.5) || (fPlan==="prox" && g.fecha_entrega && diasPara(g.fecha_entrega)<=7 && g.estado!=="entregado" && g.estado!=="cancelado"));
+  if(!lista.length){ $("listaPlan").innerHTML = `<div class="empty">Nada en esta vista.</div>`; return; }
+  let html = "";
+  for (const c of CATS){
+    const grupo = lista.filter(g=>g.categoria===c); if(!grupo.length) continue;
+    const st = grupo.filter(g=>g.estado!=="cancelado").reduce((s,g)=>s+totalGasto(g),0);
+    html += `<div class="cat">${c}<small>${cop(st)}</small></div>` + grupo.map(tarjetaGasto).join("");
+  }
+  $("listaPlan").innerHTML = html;
+}
+function tarjetaGasto(g){
+  const tot=totalGasto(g), ab=abonadoGasto(g), saldo=tot-ab, mi=miFam(), d=diasPara(g.fecha_entrega);
+  const est = {pendiente:`<span class="pill wait">Pendiente</span>`, contratado:`<span class="pill">Contratado</span>`, entregado:`<span class="pill" style="background:var(--hoja);color:#fff">Listo</span>`, cancelado:`<span class="pill no">Cancelado</span>`}[g.estado];
+  const tipo = {comun:"Común · partes iguales", invitados:"Según invitados", unitario:`${cop(g.valor)} por persona`}[g.tipo];
+  const venc = g.fecha_entrega ? (d<0 ? `<span class="pill red">Venció ${fd(g.fecha_entrega)}</span>` : d<=7 ? `<span class="pill gold">${d===0?"Hoy":"En "+d+" días"} · ${fd(g.fecha_entrega)}</span>` : `<span class="pill soft">${fd(g.fecha_entrega)}</span>`) : "";
+  const cont = g.contacto ? ` · <a href="https://wa.me/57${dig(g.contacto)}" target="_blank" rel="noopener">${esc(g.contacto)}</a>` : "";
+  const enc = g.encargado ? ` · Encargado: <b>${esc(g.encargado)}</b>` : ` · <span style="color:var(--oro);font-weight:700">Sin encargado</span>`;
+  const det = abierto===g.id ? `<div class="det">
+      <table class="t"><tr><th>Familia</th><th class="r">Le toca</th><th class="r">Abonó</th><th class="r">Saldo</th></tr>
+      ${familias.map(f=>{const p=parteFam(g,f),a=abonadoFam(g,f);return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}</td><td class="r">${cop(p)}</td><td class="r">${cop(a)}</td><td class="r" style="color:${p-a>0.5?"var(--rojo)":"var(--hoja)"}">${cop(p-a)}</td></tr>`}).join("")}</table>
+      ${abonos.filter(a=>a.gasto_id===g.id).map(a=>`<div class="meta" style="display:flex;justify-content:space-between;gap:8px"><span>${fd(a.fecha)} · ${esc(fam(a.familia_id).nombre)}${a.nota?` · ${esc(a.nota)}`:""}</span><span><b>${cop(a.valor)}</b> <button class="lnk del" data-delab="${a.id}">quitar</button></span></div>`).join("")}
+      <div class="grid3" style="align-items:end">
+        <div><label class="k">Abono de</label><select id="abFam-${g.id}">${familias.map(f=>`<option value="${f.id}" ${f.id===famId?"selected":""}>${esc(f.nombre)}</option>`).join("")}</select></div>
+        <div><label class="k">Valor</label><input id="abVal-${g.id}" inputmode="numeric" placeholder="$ 0"></div>
+        <button class="btn sm" data-abono="${g.id}">Registrar abono</button>
+      </div>
+      <input id="abNota-${g.id}" placeholder="Nota (opcional): transferencia, efectivo, a quién…" style="margin-top:8px">
+      <div class="acts" style="margin-top:8px"><button class="lnk" data-edit="${g.id}">Editar</button><button class="lnk del" data-del="${g.id}" data-n="${esc(g.nombre)}">Eliminar</button></div>
+    </div>` : "";
+  return `<div class="card ${g.estado==="entregado"?"done":g.estado==="cancelado"?"no":""}">
+    <div class="row"><div class="name">${esc(g.nombre)}</div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${venc}${est}</div></div>
+    <div class="meta">${tipo}${g.proveedor?` · ${esc(g.proveedor)}`:""}${cont}${enc}</div>
+    ${g.notas?`<div class="meta" style="font-style:italic">${esc(g.notas)}</div>`:""}
+    <div class="money"><div><b>${cop(tot)}</b><small>Total</small></div><div class="ok"><b>${cop(ab)}</b><small>Abonado</small></div><div class="${saldo>0.5?"neg":"ok"}"><b>${cop(saldo)}</b><small>Saldo</small></div></div>
+    <div class="acts"><span class="meta">A ${esc(mi.nombre)} le toca <b>${cop(parteFam(g,mi))}</b></span><button class="lnk" data-open="${g.id}">${abierto===g.id?"Cerrar":"Detalle · abonos"}</button></div>
+    ${det}</div>`;
+}
+$("filtroPlan").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fPlan=b.dataset.f;
+  $("filtroPlan").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintarPlan(); };
+$("tablaFam").addEventListener("click", async e => {
+  const b = e.target.closest("[data-usar]"); if(!b) return;
+  const f = fam(+b.dataset.usar); f.personas = confirmadosFam(f).personas;
+  await rpc("plan_guardar",{tabla:"familias", fila:{id:f.id, personas:f.personas}}); pintarPlan(); toast(`${f.nombre}: ${f.personas} invitados`);
+});
+$("verAportes").onclick = () => { $("aportes").classList.toggle("hide"); $("verAportes").textContent = $("aportes").classList.contains("hide") ? "Ver" : "Ocultar"; };
+function pintarAportes(){
+  if(!abonos.length){ $("aportes").innerHTML = `<div class="meta">Aún no hay abonos registrados.</div>`; return; }
+  const porFam = familias.map(f=>({f, t:abonos.filter(a=>a.familia_id===f.id).reduce((s,a)=>s+ +a.valor,0)}));
+  $("aportes").innerHTML = `<table class="t"><tr><th>Familia</th><th class="r">Ha aportado</th></tr>${porFam.map(x=>`<tr class="${x.f.id===famId?"me":""}"><td>${esc(x.f.nombre)}</td><td class="r">${cop(x.t)}</td></tr>`).join("")}</table>
+    <table class="t" style="margin-top:10px"><tr><th>Fecha</th><th>Familia</th><th>Gasto</th><th class="r">Valor</th></tr>
+    ${abonos.map(a=>`<tr><td>${fd(a.fecha)}</td><td>${esc(fam(a.familia_id).nombre)}</td><td>${esc((gastos.find(g=>g.id===a.gasto_id)||{}).nombre||"")}${a.nota?`<br><small style="color:#5a6656">${esc(a.nota)}</small>`:""}</td><td class="r">${cop(a.valor)}</td></tr>`).join("")}</table>`;
+}
+$("tablaFam").addEventListener("change", async e => {
+  const i = e.target.closest(".fam-personas"); if(!i) return;
+  const f = fam(+i.dataset.id); f.personas = num(i.value);
+  await rpc("plan_guardar",{tabla:"familias", fila:{id:f.id, personas:f.personas}}); pintarPlan(); toast("Invitados actualizados");
+});
+$("listaPlan").addEventListener("click", async e => {
+  const t = e.target.closest("button"); if(!t) return;
+  if (t.dataset.open){ abierto = abierto===+t.dataset.open ? null : +t.dataset.open; pintarPlan(); return; }
+  if (t.dataset.edit){ editarGasto(gastos.find(g=>g.id===+t.dataset.edit)); return; }
+  if (t.dataset.del){ if(!confirm(`¿Eliminar "${t.dataset.n}" y sus abonos?`)) return;
+    if (await rpc("plan_eliminar",{tabla:"gastos", fila:+t.dataset.del})){ gastos=gastos.filter(g=>g.id!==+t.dataset.del); abonos=abonos.filter(a=>a.gasto_id!==+t.dataset.del); pintarPlan(); toast("Eliminado"); } return; }
+  if (t.dataset.delab){ if(!confirm("¿Quitar este abono?")) return;
+    if (await rpc("plan_eliminar",{tabla:"abonos", fila:+t.dataset.delab})){ abonos=abonos.filter(a=>a.id!==+t.dataset.delab); pintarPlan(); } return; }
+  if (t.dataset.abono){ const id=+t.dataset.abono, v=num($("abVal-"+id).value); if(!v){ $("abVal-"+id).focus(); return; }
+    const fila={gasto_id:id, familia_id:+$("abFam-"+id).value, valor:v, nota:$("abNota-"+id).value.trim()};
+    const nid = await rpc("plan_guardar",{tabla:"abonos", fila}); if(!nid){ toast("No se pudo guardar"); return; }
+    abonos.unshift({id:nid, fecha:new Date().toISOString().slice(0,10), ...fila}); pintarPlan(); toast("Abono registrado"); }
+});
+/* ----- formulario gasto ----- */
+function abrirForm(){ $("formGasto").classList.remove("hide"); $("formGasto").scrollIntoView({behavior:"smooth",block:"start"}); }
+function limpiarForm(){ ["gId","gNombre","gValor","gFecha","gProv","gCont","gEnc","gNotas"].forEach(i=>$(i).value=""); $("gCat").value="Otros"; $("gTipo").value="comun"; $("gEstado").value="pendiente"; $("formTitulo").textContent="Nuevo gasto o tarea"; }
+$("fabNuevo").onclick = () => { limpiarForm(); abrirForm(); };
+$("gCancelar").onclick = () => $("formGasto").classList.add("hide");
+$("gTipo").onchange = () => $("lblValor").textContent = $("gTipo").value==="unitario" ? "Valor por persona" : "Valor total";
+$("gValor").addEventListener("blur", () => { const v=num($("gValor").value); $("gValor").value = v ? cop(v) : ""; });
+function editarGasto(g){ limpiarForm(); $("formTitulo").textContent="Editar: "+g.nombre; $("gId").value=g.id; $("gNombre").value=g.nombre; $("gCat").value=g.categoria; $("gTipo").value=g.tipo; $("gTipo").onchange();
+  $("gValor").value=g.valor?cop(g.valor):""; $("gFecha").value=g.fecha_entrega||""; $("gProv").value=g.proveedor||""; $("gCont").value=g.contacto||""; $("gEnc").value=g.encargado||""; $("gEstado").value=g.estado; $("gNotas").value=g.notas||""; abrirForm(); }
+$("gGuardar").onclick = async () => {
+  const nombre=$("gNombre").value.trim(); if(nombre.length<2){ $("gNombre").focus(); return; }
+  const fila={ id:$("gId").value||"", nombre, categoria:$("gCat").value, tipo:$("gTipo").value, valor:num($("gValor").value), fecha_entrega:$("gFecha").value||"",
+    proveedor:$("gProv").value.trim(), contacto:$("gCont").value.trim(), encargado:$("gEnc").value.trim(), estado:$("gEstado").value, notas:$("gNotas").value.trim() };
+  $("gGuardar").disabled=true;
+  try { const id = await rpc("plan_guardar",{tabla:"gastos", fila}); if(!id) throw 0;
+    const p = await rpc("plan_listar",{}); gastos=p.gastos; abonos=p.abonos; abierto=id; $("formGasto").classList.add("hide"); pintarPlan(); toast("Guardado"); }
+  catch(e){ toast("No se pudo guardar"); console.error(e); }
+  $("gGuardar").disabled=false;
+};
 
 /* ================= INVITADOS ================= */
+function confirmacionDe(i){
+  if (i.confirmado===true || i.confirmado===false) return {manual:true, asiste:i.confirmado, adultos:i.personas||0, ninos:0};
+  const mias = conf.filter(c=>(c.familia_id||1)===i.familia_id);
+  const tel = dig(i.telefono), nom = norm(i.nombre);
+  return mias.find(c => (tel && dig(c.telefono) === tel)) || mias.find(c => norm(c.nombre) === nom) ||
+         mias.find(c => nom.length > 6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre)))) || null;
+}
 function pintarInv(){
-  const filas = inv.map(i => ({...i, c: confirmacionDe(i)}));
-  const env = filas.filter(f=>f.enviado), confs = filas.filter(f=>f.c && f.c.asiste), sinresp = filas.filter(f=>f.enviado && !f.c);
+  const mios = inv.filter(i=>i.familia_id===famId).map(i => ({...i, c: confirmacionDe(i)}));
+  const env = mios.filter(f=>f.enviado), confs = mios.filter(f=>f.c && f.c.asiste), sinresp = mios.filter(f=>f.enviado && !f.c);
+  const personas = confs.reduce((s,f)=>s+(f.c.manual ? (f.personas||1) : (+f.c.adultos + +f.c.ninos)),0);
   $("statsInv").innerHTML = `
-    <div class="stat total"><b>${filas.length}</b><small>Invitados</small></div>
+    <div class="stat total"><b>${mios.length}</b><small>Invitados</small></div>
     <div class="stat"><b>${env.length}</b><small>Enviados</small></div>
     <div class="stat"><b>${confs.length}</b><small>Confirmaron</small></div>
-    <div class="stat"><b>${sinresp.length}</b><small>Sin respuesta</small></div>`;
-  const lista = filas.filter(f => fInv==="todos" || (fInv==="pend" && !f.enviado) || (fInv==="env" && f.enviado) || (fInv==="sinresp" && f.enviado && !f.c) || (fInv==="conf" && f.c));
+    <div class="stat"><b>${personas}</b><small>Personas conf.</small></div>`;
+  $("famNombreInv").textContent = miFam().nombre;
+  const lista = mios.filter(f => fInv==="todos" || (fInv==="pend" && !f.enviado) || (fInv==="env" && f.enviado) || (fInv==="sinresp" && f.enviado && !f.c) || (fInv==="conf" && f.c));
   $("listaInv").innerHTML = lista.length ? lista.map(f => {
-    const estado = f.c ? (f.c.asiste ? `<span class="pill">Confirmó · ${f.c.adultos} ad · ${f.c.ninos} ni</span>` : `<span class="pill no">No asiste</span>`)
+    const estado = f.c ? (f.c.asiste ? `<span class="pill">Confirmó${f.c.manual?"":` · ${f.c.adultos} ad · ${f.c.ninos} ni`}</span>` : `<span class="pill no">No asiste</span>`)
                        : (f.enviado ? `<span class="pill wait">Sin respuesta</span>` : `<span class="pill gold">Por enviar</span>`);
     const tel = f.telefono ? ` · <a href="https://wa.me/57${dig(f.telefono)}" target="_blank" rel="noopener">${esc(f.telefono)}</a>` : "";
     return `<div class="card">
       <div class="row"><div class="name">${esc(f.nombre)}</div>${estado}</div>
-      <div class="meta">Agregado ${fecha(f.creado_en)}${tel}${f.notas?` · ${esc(f.notas)}`:""}</div>
+      <div class="meta">${tel?tel.slice(3):""}${f.notas?` · ${esc(f.notas)}`:""}</div>
       <div class="acts">
-        <label class="check"><input type="checkbox" data-id="${f.id}" ${f.enviado?"checked":""}> Invitación enviada</label>
-        <button class="del" data-id="${f.id}" data-n="${esc(f.nombre)}">Eliminar</button>
+        <label class="check"><input type="checkbox" data-env="${f.id}" ${f.enviado?"checked":""}> Enviada</label>
+        <label class="check"><input type="checkbox" data-conf="${f.id}" ${f.c&&f.c.asiste?"checked":""}> Confirmó</label>
+        <input class="fam-personas" data-pers="${f.id}" value="${f.personas??""}" placeholder="pers." inputmode="numeric" title="Personas que vienen">
+        <button class="lnk del" data-id="${f.id}" data-n="${esc(f.nombre)}">Eliminar</button>
       </div></div>`; }).join("") : `<div class="empty">Nada en esta vista.</div>`;
 }
 $("filtroInv").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fInv=b.dataset.f;
   $("filtroInv").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintarInv(); };
 $("listaInv").addEventListener("change", async e => {
-  const cb = e.target.closest("input[type=checkbox]"); if(!cb) return;
-  const ok = await rpc("marcar_enviado",{fila:+cb.dataset.id, valor:cb.checked});
-  if(!ok){ cb.checked=!cb.checked; toast("No se pudo guardar"); return; }
-  const it = inv.find(i=>i.id===+cb.dataset.id); it.enviado = cb.checked; pintarInv();
+  const t = e.target;
+  if (t.dataset.env){ const ok = await rpc("marcar_enviado",{fila:+t.dataset.env, valor:t.checked}); if(!ok){ t.checked=!t.checked; toast("No se pudo guardar"); return; } inv.find(i=>i.id===+t.dataset.env).enviado=t.checked; pintarInv(); }
+  if (t.dataset.conf){ const it=inv.find(i=>i.id===+t.dataset.conf); it.confirmado = t.checked ? true : null;
+    await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, confirmado:it.confirmado}}); pintarInv(); }
+  if (t.dataset.pers){ const it=inv.find(i=>i.id===+t.dataset.pers); it.personas = num(t.value)||null;
+    await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, personas:it.personas??""}}); pintarInv(); }
 });
 $("listaInv").addEventListener("click", async e => {
   const b = e.target.closest(".del"); if(!b) return;
-  if(!confirm(`¿Eliminar a ${b.dataset.n} de la lista de invitados?`)) return;
-  if(await rpc("eliminar_invitado",{fila:+b.dataset.id})){ inv = inv.filter(i=>i.id!==+b.dataset.id); pintarInv(); } else toast("No se pudo eliminar");
+  if(!confirm(`¿Eliminar a ${b.dataset.n} de la lista?`)) return;
+  if(await rpc("eliminar_invitado",{fila:+b.dataset.id})){ inv = inv.filter(i=>i.id!==+b.dataset.id); pintarInv(); pintarPlan(); } else toast("No se pudo eliminar");
 });
 $("agregar").onclick = async () => {
   const n = $("nuevoNombre").value.trim(); if(n.length<2){ $("nuevoNombre").focus(); return; }
-  const id = await rpc("guardar_invitado",{p_nombre:n, p_telefono:$("nuevoTel").value.trim()||null});
+  const id = await rpc("guardar_invitado",{p_nombre:n, p_telefono:$("nuevoTel").value.trim()||null, familia:famId});
   if(!id){ toast("No se pudo guardar"); return; }
-  inv = await rpc("listar_invitados",{}); $("nuevoNombre").value=""; $("nuevoTel").value=""; pintarInv(); toast("Agregado");
+  inv = await rpc("listar_invitados",{}); $("nuevoNombre").value=""; $("nuevoTel").value=""; pintarInv(); pintarPlan(); toast("Agregado");
 };
 $("nuevoNombre").addEventListener("keydown", e => e.key==="Enter" && $("agregar").click());
 $("verImportar").onclick = () => $("importar").classList.toggle("hide");
 $("importarBtn").onclick = async () => {
   const lineas = $("lineas").value.split("\n").map(l=>l.trim()).filter(Boolean); if(!lineas.length) return;
-  const n = await rpc("importar_invitados",{lineas});
-  inv = await rpc("listar_invitados",{}); $("lineas").value=""; $("importar").classList.add("hide"); pintarInv(); toast(`${n} invitado${n!==1?"s":""} agregado${n!==1?"s":""}`);
+  const n = await rpc("importar_invitados",{lineas, familia:famId});
+  inv = await rpc("listar_invitados",{}); $("lineas").value=""; $("importar").classList.add("hide"); pintarInv(); pintarPlan(); toast(`${n} agregado${n!==1?"s":""}`);
 };
 
 /* ================= CONFIRMACIONES ================= */
 function pintarConf(){
-  const si = conf.filter(d=>d.asiste), no = conf.filter(d=>!d.asiste);
+  const mi = miFam();
+  $("tablaConfTot").innerHTML = `<tr><th>Familia</th><th class="r">Respuestas</th><th class="r">Adultos</th><th class="r">Niños</th><th class="r">Manual</th><th class="r">Personas</th></tr>` +
+    familias.map(f=>{const c=confirmadosFam(f);return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}</td><td class="r">${c.familias}</td><td class="r">${c.adultos}</td><td class="r">${c.ninos}</td><td class="r">${c.manual}</td><td class="r"><b>${c.personas}</b></td></tr>`}).join("") +
+    (()=>{const T=familias.map(confirmadosFam);return `<tr><td><b>Total</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.familias,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.adultos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.ninos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.manual,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.personas,0)}</b></td></tr>`})();
+  $("confTitulo").innerHTML = `Respuestas recibidas por la página de confirmación de la familia <b>${esc(mi.nombre)}</b>. "Manual" son los marcados a mano en la lista de invitados.`;
+  const mias = conf.filter(c=>(c.familia_id||1)===famId);
+  const si = mias.filter(d=>d.asiste), no = mias.filter(d=>!d.asiste);
   const ad = si.reduce((a,d)=>a+d.adultos,0), ni = si.reduce((a,d)=>a+d.ninos,0);
   $("statsConf").innerHTML = `
     <div class="stat total"><b>${ad+ni}</b><small>Personas</small></div>
     <div class="stat"><b>${ad}</b><small>Adultos</small></div>
     <div class="stat"><b>${ni}</b><small>Niños</small></div>
-    <div class="stat"><b>${si.length}</b><small>Familias</small></div>`;
-  const lista = fConf==="todos" ? conf : fConf==="si" ? si : no;
+    <div class="stat"><b>${si.length}</b><small>Respuestas</small></div>`;
+  const lista = fConf==="todos" ? mias : fConf==="si" ? si : no;
   $("listaConf").innerHTML = lista.length ? lista.map(d => `
     <div class="card ${d.asiste?"":"no"}">
       <div class="row"><div class="name">${esc(d.nombre)}</div>
         <span class="pill ${d.asiste?"":"no"}">${d.asiste?`${d.adultos} adulto${d.adultos!==1?"s":""} · ${d.ninos} niño${d.ninos!==1?"s":""}`:"No asiste"}</span></div>
       <div class="meta">${fecha(d.creado_en)}${d.telefono?` · <a href="https://wa.me/57${dig(d.telefono)}" target="_blank" rel="noopener">${esc(d.telefono)}</a>`:""}</div>
-      ${d.mensaje?`<div class="msg">${esc(d.mensaje)}</div>`:""}
-      <div class="acts"><button class="del" data-id="${d.id}" data-n="${esc(d.nombre)}">Eliminar</button></div>
-    </div>`).join("") : `<div class="empty">Todavía no hay confirmaciones en esta vista.</div>`;
+      ${d.mensaje?`<div class="meta" style="font-style:italic;border-left:3px solid var(--oro);padding-left:10px;margin-top:8px">${esc(d.mensaje)}</div>`:""}
+      <div class="acts"><button class="lnk del" data-id="${d.id}" data-n="${esc(d.nombre)}">Eliminar</button></div>
+    </div>`).join("") : `<div class="empty">Todavía no hay confirmaciones de ${esc(mi.nombre)} en esta vista.</div>`;
 }
 $("filtroConf").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fConf=b.dataset.f;
   $("filtroConf").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintarConf(); };
-$("refrescar").onclick = async () => { await cargarTodo(); pintarInv(); pintarConf(); toast("Actualizado"); };
+$("refrescar").onclick = async () => { await cargarTodo(); pintarFams(); pintarPlan(); pintarInv(); pintarConf(); toast("Actualizado"); };
 $("listaConf").addEventListener("click", async e => {
   const b = e.target.closest(".del"); if(!b) return;
   if(!confirm(`¿Eliminar la confirmación de ${b.dataset.n}?`)) return;
@@ -253,33 +492,67 @@ $("listaConf").addEventListener("click", async e => {
 function pdfBase(titulo, sub){
   const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:"mm", format:"a4"});
   doc.setFillColor(47,74,46); doc.rect(0,0,210,30,"F");
-  doc.setTextColor(251,248,241); doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.text("Primera Comunión · Juan Alejandro y Juan Ángel", 14, 13);
-  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text("Sábado 19 de septiembre de 2026 · Catedral de Ibagué · Finca Magakú Campestre", 14, 20);
+  doc.setTextColor(251,248,241); doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.text("Primera Comunión · Familias Ospina, Guevara y Sánchez", 14, 13);
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text("Juan Alejandro y Juan Ángel · María Lucía · Juan Esteban y Pablo Emilio · Sábado 19 de septiembre de 2026 · Finca Magakú Campestre", 14, 20);
   doc.setTextColor(47,74,46); doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.text(titulo, 14, 40);
   doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90,102,86); doc.text(sub, 14, 46);
   return doc;
 }
-const estilo = { headStyles:{fillColor:[47,74,46], textColor:[251,248,241]}, alternateRowStyles:{fillColor:[245,240,228]}, styles:{font:"helvetica", fontSize:9.5, cellPadding:2.5}, margin:{left:14,right:14} };
+const estilo = { headStyles:{fillColor:[47,74,46], textColor:[251,248,241]}, alternateRowStyles:{fillColor:[245,240,228]}, styles:{font:"helvetica", fontSize:8.5, cellPadding:2.2}, margin:{left:14,right:14} };
 function pie(doc){ const n = doc.internal.getNumberOfPages(); for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text(`Generado ${new Date().toLocaleDateString("es-CO")} · página ${i} de ${n}`, 14, 290); } }
+const estTxt = {pendiente:"Pendiente",contratado:"Contratado",entregado:"Listo",cancelado:"Cancelado"};
 
+$("pdfPlan").onclick = () => {
+  const act = activos(), tot = act.reduce((s,g)=>s+totalGasto(g),0), ab = act.reduce((s,g)=>s+abonadoGasto(g),0);
+  const doc = pdfBase("Plan y presupuesto", `Total ${cop(tot)} · abonado ${cop(ab)} · saldo ${cop(tot-ab)} · ${personasTotal()} invitados`);
+  doc.autoTable({ ...estilo, startY:52, head:[["Familia","Invitados","Le toca","Abonó","Saldo"]],
+    body: familias.map(f=>{const t=act.reduce((s,g)=>s+parteFam(g,f),0),a=act.reduce((s,g)=>s+abonadoFam(g,f),0);return [f.nombre,f.personas,cop(t),cop(a),cop(t-a)];}),
+    columnStyles:{1:{halign:"center"},2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}} });
+  let y = doc.lastAutoTable.finalY + 8;
+  for (const c of CATS){ const grupo = gastos.filter(g=>g.categoria===c); if(!grupo.length) continue;
+    doc.setFontSize(11); doc.setTextColor(47,74,46); doc.setFont("helvetica","bold"); doc.text(c, 14, y);
+    doc.autoTable({ ...estilo, startY:y+2, head:[["Gasto / tarea","Proveedor · contacto","Encargado","Fecha","Estado","Total","Abonado","Saldo"]],
+      body: grupo.map(g=>[g.nombre+(g.notas?"\n"+g.notas:""), [g.proveedor,g.contacto].filter(Boolean).join(" · "), g.encargado||"—", fd(g.fecha_entrega)||"—", estTxt[g.estado], cop(totalGasto(g)), cop(abonadoGasto(g)), cop(totalGasto(g)-abonadoGasto(g))]),
+      columnStyles:{0:{cellWidth:44},5:{halign:"right"},6:{halign:"right"},7:{halign:"right"}} });
+    y = doc.lastAutoTable.finalY + 8; if (y > 260){ doc.addPage(); y = 20; } }
+  if (abonos.length){ if (y > 230){ doc.addPage(); y = 20; }
+    doc.setFontSize(11); doc.setTextColor(47,74,46); doc.setFont("helvetica","bold"); doc.text("Aportes registrados", 14, y);
+    doc.autoTable({ ...estilo, startY:y+2, head:[["Fecha","Familia","Gasto","Nota","Valor"]], body: abonos.map(a=>[fd(a.fecha), fam(a.familia_id).nombre, (gastos.find(g=>g.id===a.gasto_id)||{}).nombre||"", a.nota||"", cop(a.valor)]), columnStyles:{4:{halign:"right"}} }); }
+  pie(doc); doc.save("plan-primera-comunion.pdf");
+};
+$("pdfFam").onclick = () => {
+  const f = miFam(), act = activos(), t = act.reduce((s,g)=>s+parteFam(g,f),0), a = act.reduce((s,g)=>s+abonadoFam(g,f),0);
+  const doc = pdfBase(`Cuenta de la familia ${f.nombre}`, `${f.personas} invitados · le corresponde ${cop(t)} · abonado ${cop(a)} · saldo ${cop(t-a)}`);
+  doc.autoTable({ ...estilo, startY:52, head:[["Gasto","Reparto","Total del gasto","Le toca","Abonó","Saldo"]],
+    body: act.map(g=>[g.nombre, {comun:"Partes iguales",invitados:"Por invitados",unitario:"Por persona"}[g.tipo], cop(totalGasto(g)), cop(parteFam(g,f)), cop(abonadoFam(g,f)), cop(parteFam(g,f)-abonadoFam(g,f))]),
+    columnStyles:{2:{halign:"right"},3:{halign:"right"},4:{halign:"right"},5:{halign:"right"}} });
+  const abs = abonos.filter(x=>x.familia_id===f.id);
+  if (abs.length) doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["Fecha","Abono a","Nota","Valor"]],
+    body: abs.map(x=>[fd(x.fecha), (gastos.find(g=>g.id===x.gasto_id)||{}).nombre||"", x.nota||"", cop(x.valor)]), columnStyles:{3:{halign:"right"}} });
+  const tareas = gastos.filter(g=>norm(g.encargado)===norm(f.nombre) && g.estado!=="entregado" && g.estado!=="cancelado");
+  if (tareas.length) doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["Tareas a cargo de "+f.nombre,"Fecha","Estado"]], body: tareas.map(g=>[g.nombre, fd(g.fecha_entrega)||"—", estTxt[g.estado]]) });
+  pie(doc); doc.save(`cuenta-${norm(f.nombre).replace(/\s+/g,"-")}.pdf`);
+};
 $("pdfConf").onclick = () => {
-  const si = conf.filter(d=>d.asiste), no = conf.filter(d=>!d.asiste);
+  const mias = conf.filter(c=>(c.familia_id||1)===famId), si = mias.filter(d=>d.asiste), no = mias.filter(d=>!d.asiste);
   const ad = si.reduce((a,d)=>a+d.adultos,0), ni = si.reduce((a,d)=>a+d.ninos,0);
-  const doc = pdfBase("Lista de confirmados", `${si.length} familias · ${ad} adultos · ${ni} niños · ${ad+ni} personas en total · ${no.length} no asisten`);
-  doc.autoTable({ ...estilo, startY: 52, head:[["#","Nombre","Celular","Adultos","Niños","Mensaje","Fecha"]],
+  const doc = pdfBase(`Confirmados · familia ${miFam().nombre}`, `${si.length} respuestas · ${ad} adultos · ${ni} niños · ${ad+ni} personas · ${no.length} no asisten`);
+  doc.autoTable({ ...estilo, startY:52, head:[["#","Nombre","Celular","Adultos","Niños","Mensaje","Fecha"]],
     body: si.map((d,k)=>[k+1, d.nombre, d.telefono||"", d.adultos, d.ninos, d.mensaje||"", fecha(d.creado_en)]),
     columnStyles:{0:{cellWidth:8},3:{halign:"center",cellWidth:16},4:{halign:"center",cellWidth:14},6:{cellWidth:26}} });
-  if (no.length){ doc.autoTable({ ...estilo, startY: doc.lastAutoTable.finalY+8, head:[["No asisten","Celular","Mensaje"]], body: no.map(d=>[d.nombre,d.telefono||"",d.mensaje||""]) }); }
-  pie(doc); doc.save("confirmados-primera-comunion.pdf");
+  if (no.length) doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["No asisten","Celular","Mensaje"]], body: no.map(d=>[d.nombre,d.telefono||"",d.mensaje||""]) });
+  const T=familias.map(f=>({f,c:confirmadosFam(f)}));
+  doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["Totales de las tres familias","Respuestas","Adultos","Niños","Manual","Personas"]],
+    body:[...T.map(x=>[x.f.nombre,x.c.familias,x.c.adultos,x.c.ninos,x.c.manual,x.c.personas]),["Total",T.reduce((s,x)=>s+x.c.familias,0),T.reduce((s,x)=>s+x.c.adultos,0),T.reduce((s,x)=>s+x.c.ninos,0),T.reduce((s,x)=>s+x.c.manual,0),T.reduce((s,x)=>s+x.c.personas,0)]] });
+  pie(doc); doc.save(`confirmados-${norm(miFam().nombre)}.pdf`);
 };
 $("pdfInv").onclick = () => {
-  const filas = inv.map(i=>({...i,c:confirmacionDe(i)}));
-  const env = filas.filter(f=>f.enviado).length, cf = filas.filter(f=>f.c&&f.c.asiste).length;
-  const doc = pdfBase("Lista de invitados · checklist", `${filas.length} invitados · ${env} con invitación enviada · ${cf} confirmaron · ${filas.filter(f=>f.enviado&&!f.c).length} sin respuesta`);
-  doc.autoTable({ ...estilo, startY: 52, head:[["#","Invitado","Celular","Enviada","Estado","Personas"]],
-    body: filas.map((f,k)=>[k+1, f.nombre, f.telefono||"", f.enviado?"Sí":"", f.c?(f.c.asiste?"Confirmó":"No asiste"):(f.enviado?"Sin respuesta":"Por enviar"), f.c&&f.c.asiste?`${f.c.adultos} ad · ${f.c.ninos} ni`:""]),
+  const f = miFam(), filas = inv.filter(i=>i.familia_id===famId).map(i=>({...i,c:confirmacionDe(i)}));
+  const doc = pdfBase(`Invitados de la familia ${f.nombre} · checklist`, `${filas.length} invitados · ${filas.filter(x=>x.enviado).length} enviados · ${filas.filter(x=>x.c&&x.c.asiste).length} confirmaron · ${filas.filter(x=>x.enviado&&!x.c).length} sin respuesta`);
+  doc.autoTable({ ...estilo, startY:52, head:[["#","Invitado","Celular","Enviada","Estado","Personas"]],
+    body: filas.map((x,k)=>[k+1, x.nombre, x.telefono||"", x.enviado?"Sí":"", x.c?(x.c.asiste?"Confirmó":"No asiste"):(x.enviado?"Sin respuesta":"Por enviar"), x.c&&x.c.asiste?(x.c.manual?(x.personas||""):`${x.c.adultos} ad · ${x.c.ninos} ni`):""]),
     columnStyles:{0:{cellWidth:8},3:{halign:"center",cellWidth:18},4:{cellWidth:28},5:{cellWidth:24}} });
-  pie(doc); doc.save("invitados-primera-comunion.pdf");
+  pie(doc); doc.save(`invitados-${norm(f.nombre).replace(/\s+/g,"-")}.pdf`);
 };
 </script>
 </body>
