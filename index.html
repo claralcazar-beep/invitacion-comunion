@@ -118,6 +118,22 @@
   .parents b{display:block;font-style:normal;font-weight:600;color:var(--musgo);margin-top:4px}
   footer{padding:24px;text-align:center;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--salvia)}
 
+  /* ---------- Sobre / bienvenida ---------- */
+  .sobre{position:fixed;inset:0;z-index:100;background:#1C2E1E;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;color:var(--crudo);
+    transition:opacity .8s,visibility .8s}
+  .sobre.abierto{opacity:0;visibility:hidden}
+  .sobre .blur{position:absolute;inset:-40px;background:url(assets/familia-duotono.jpg) center/cover no-repeat;filter:blur(26px) brightness(.35);opacity:.9}
+  .sobre>*{position:relative}
+  .sobre .k{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--salvia);font-weight:700}
+  .sobre .n{font-family:var(--display);font-weight:600;font-size:1.5rem;margin:14px 0 4px}
+  .sobre .e{font-family:var(--display);font-weight:600;font-size:clamp(2.6rem,13vw,4rem);line-height:.95;color:var(--oro-claro)}
+  .sobre .d{font-family:var(--display);font-style:italic;font-weight:300;font-size:1.15rem;margin-top:16px;color:var(--crudo)}
+  .sobre .abrir{margin-top:38px;padding:16px 34px;border-radius:999px;border:1px solid var(--oro-claro);background:var(--oro-claro);color:#1C2E1E;font:inherit;font-weight:700;font-size:1rem;cursor:pointer;
+    box-shadow:0 14px 30px -12px rgba(0,0,0,.6);animation:latir 2.4s ease-in-out infinite}
+  @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  .sobre .nota{margin-top:14px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--salvia)}
+  .sobre .cross{margin:0 auto 6px}
+
   /* ---------- Música ---------- */
   .music{position:fixed;right:16px;bottom:16px;z-index:50;width:50px;height:50px;border-radius:50%;border:1px solid var(--oro);background:var(--musgo);color:var(--oro-claro);
     display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
@@ -132,6 +148,18 @@
 </style>
 </head>
 <body>
+
+<!-- ===================== SOBRE (pantalla de bienvenida) ===================== -->
+<div class="sobre" id="sobre">
+  <div class="blur" aria-hidden="true"></div>
+  <svg class="cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 2v20M5 8h14"/><circle cx="12" cy="8" r="3.2" fill="#1C2E1E"/></svg>
+  <div class="k">Tienes una invitación</div>
+  <div class="n">Juan Alejandro &amp; Juan Ángel</div>
+  <div class="e">Primera<br>Comunión</div>
+  <div class="d" id="fechaSobre"></div>
+  <button class="abrir" id="abrir">Abrir invitación</button>
+  <div class="nota">Activa el sonido de tu celular</div>
+</div>
 
 <!-- ===================== HERO ===================== -->
 <header class="hero">
@@ -244,7 +272,7 @@
   <div class="parents" id="padres"></div>
 </section>
 <!-- Música de fondo: sube tu canción como assets/musica.mp3 -->
-<audio id="musica" src="assets/musica.mp3" loop preload="auto"></audio>
+<audio id="musica" src="assets/musica.mp3?v=2" loop preload="auto"></audio>
 <button class="music" id="btnMusica" aria-label="Activar o pausar la música">
   <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
   <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M3 3l18 18"/></svg>
@@ -304,17 +332,36 @@ tick(); setInterval(tick, 30000);
 
 /* --------- Música de fondo --------- */
 const musica = document.getElementById("musica"), btnMusica = document.getElementById("btnMusica");
-let quiereMusica = true;
-musica.addEventListener("canplaythrough", () => btnMusica.classList.add("ready"), {once:true});
-musica.addEventListener("error", () => btnMusica.classList.remove("ready"));   // sin archivo, sin botón
+let quiereMusica = true, sonando = false;
 musica.volume = 0.6;
-function sonar(){ if(!quiereMusica) return; musica.play().then(()=>btnMusica.classList.add("playing")).catch(()=>{}); }
-function primerToque(){ sonar(); removeEventListener("touchstart", primerToque); removeEventListener("click", primerToque); removeEventListener("scroll", primerToque); }
-addEventListener("touchstart", primerToque, {passive:true}); addEventListener("click", primerToque); addEventListener("scroll", primerToque, {passive:true});
+musica.addEventListener("loadedmetadata", () => btnMusica.classList.add("ready"));
+musica.addEventListener("error", () => btnMusica.classList.remove("ready"));
+musica.addEventListener("playing", () => { sonando = true; btnMusica.classList.add("playing","ready"); });
+musica.addEventListener("pause",   () => { sonando = false; btnMusica.classList.remove("playing"); });
+async function sonar(){
+  if (!quiereMusica || sonando) return true;
+  try { await musica.play(); return true; } catch(e){ return false; }   // false = el navegador aún no autoriza
+}
+// El sonido solo se autoriza tras un toque real (levantar el dedo / clic); reintenta hasta lograrlo
+["pointerup","touchend","click","keydown"].forEach(ev => addEventListener(ev, async () => {
+  if (!quiereMusica || sonando) return;
+  await sonar();
+}, {passive:true}));
 btnMusica.addEventListener("click", e => {
   e.stopPropagation();
-  if (musica.paused){ quiereMusica = true; sonar(); } else { quiereMusica = false; musica.pause(); btnMusica.classList.remove("playing"); }
+  if (musica.paused){ quiereMusica = true; sonar(); } else { quiereMusica = false; musica.pause(); }
 });
+// Pantalla de bienvenida: ese toque autoriza la música
+document.getElementById("fechaSobre").textContent = fmt.format(d);
+document.getElementById("abrir").addEventListener("click", () => {
+  quiereMusica = true; sonar();
+  document.getElementById("sobre").classList.add("abierto");
+  document.body.style.overflow = "";
+});
+document.body.style.overflow = "hidden";
+// Al volver a la pestaña o a la app, retoma
+document.addEventListener("visibilitychange", () => { if (!document.hidden) sonar(); });
+musica.addEventListener("ended", () => { musica.currentTime = 0; sonar(); });   // por si algún navegador ignora loop
 
 /* --------- El camino se dibuja al hacer scroll --------- */
 const ink = document.getElementById("ink");
