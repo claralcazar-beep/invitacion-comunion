@@ -121,8 +121,7 @@
           <div><label>Categoría</label><select id="gCat"></select></div>
           <div><label>Cómo se reparte</label><select id="gTipo">
             <option value="comun">Común · partes iguales</option>
-            <option value="invitados">Total repartido según invitados</option>
-            <option value="unitario">Valor por persona × invitados</option></select></div>
+            <option value="invitados">Total repartido según invitados</option></select></div>
         </div>
         <div class="grid2">
           <div><label id="lblValor">Valor total</label><input id="gValor" inputmode="numeric" placeholder="$ 0"><div class="meta" id="gPreview" style="margin-top:4px"></div></div>
@@ -276,12 +275,11 @@ document.querySelector(".tabs").onclick = e => { const b=e.target.closest("butto
 
 /* ================= PLAN: cálculos ================= */
 const personasTotal = () => familias.reduce((a,f)=>a+(+f.personas||0),0);
-function totalGasto(g){ return g.tipo==="unitario" ? +g.valor*personasTotal() : +g.valor; }
+function totalGasto(g){ return +g.valor; }   // el valor siempre es el total del gasto
 function parteFam(g, f){
   const P = personasTotal(), n = familias.length || 1;
   if (g.tipo==="comun") return +g.valor/n;
-  if (g.tipo==="invitados") return P ? +g.valor*(+f.personas||0)/P : +g.valor/n;
-  return +g.valor*(+f.personas||0);
+  return P ? +g.valor*(+f.personas||0)/P : +g.valor/n;   // invitados (y cualquier tipo viejo)
 }
 const abonadoGasto = g => abonos.filter(a=>a.gasto_id===g.id).reduce((s,a)=>s+ +a.valor,0);
 const abonadoFam = (g,f) => abonos.filter(a=>a.gasto_id===g.id && a.familia_id===f.id).reduce((s,a)=>s+ +a.valor,0);
@@ -343,7 +341,7 @@ function pintarPlan(){
 function tarjetaGasto(g){
   const tot=totalGasto(g), ab=abonadoGasto(g), saldo=tot-ab, mi=miFam(), d=diasPara(g.fecha_entrega);
   const est = {pendiente:`<span class="pill wait">Pendiente</span>`, contratado:`<span class="pill">Contratado</span>`, entregado:`<span class="pill" style="background:var(--hoja);color:#fff">Listo</span>`, cancelado:`<span class="pill no">Cancelado</span>`}[g.estado];
-  const tipo = {comun:"Común · partes iguales", invitados:"Según invitados", unitario:`${cop(g.valor)} por persona`}[g.tipo];
+  const tipo = g.tipo==="comun" ? "Común · partes iguales" : "Según invitados";
   const venc = g.fecha_entrega ? (d<0 ? `<span class="pill red">Venció ${fd(g.fecha_entrega)}</span>` : d<=7 ? `<span class="pill gold">${d===0?"Hoy":"En "+d+" días"} · ${fd(g.fecha_entrega)}</span>` : `<span class="pill soft">${fd(g.fecha_entrega)}</span>`) : "";
   const cont = g.contacto ? ` · <a href="https://wa.me/57${dig(g.contacto)}" target="_blank" rel="noopener">${esc(g.contacto)}</a>` : "";
   const enc = g.encargado ? ` · Encargado: <b>${esc(g.encargado)}</b>` : ` · <span style="color:var(--oro);font-weight:700">Sin encargado</span>`;
@@ -408,16 +406,13 @@ function limpiarForm(){ ["gId","gNombre","gValor","gFecha","gProv","gCont","gEnc
 $("fabNuevo").onclick = () => { limpiarForm(); if(catSel) $("gCat").value = catSel; abrirForm(); };
 $("gCancelar").onclick = () => $("formGasto").classList.add("hide");
 function previewValor(){
-  const v = num($("gValor").value), P = personasTotal();
-  $("lblValor").textContent = $("gTipo").value==="unitario" ? "Valor por persona" : "Valor total";
-  $("gPreview").innerHTML = !v ? "" : $("gTipo").value==="unitario"
-    ? `= ${cop(v)} × ${P} invitados = <b>${cop(v*P)}</b> en total`
-    : `Total del gasto: <b>${cop(v)}</b> (${$("gTipo").value==="comun" ? "se divide en 3 partes iguales" : "se reparte según los invitados de cada familia"})`;
+  const v = num($("gValor").value);
+  $("gPreview").innerHTML = !v ? "" : `Total del gasto: <b>${cop(v)}</b> (${$("gTipo").value==="comun" ? "se divide en 3 partes iguales" : "se reparte según los invitados de cada familia"})`;
 }
 $("gTipo").onchange = previewValor;
 $("gValor").addEventListener("input", previewValor);
 $("gValor").addEventListener("blur", () => { const v=num($("gValor").value); $("gValor").value = v ? cop(v) : ""; previewValor(); });
-function editarGasto(g){ limpiarForm(); $("formTitulo").textContent="Editar: "+g.nombre; $("gId").value=g.id; $("gNombre").value=g.nombre; $("gCat").value=g.categoria; $("gTipo").value=g.tipo;
+function editarGasto(g){ limpiarForm(); $("formTitulo").textContent="Editar: "+g.nombre; $("gId").value=g.id; $("gNombre").value=g.nombre; $("gCat").value=g.categoria; $("gTipo").value = g.tipo==="comun" ? "comun" : "invitados";
   $("gValor").value=g.valor?cop(g.valor):""; $("gFecha").value=g.fecha_entrega||""; $("gProv").value=g.proveedor||""; $("gCont").value=g.contacto||""; $("gEnc").value=g.encargado||""; $("gEstado").value=g.estado; $("gNotas").value=g.notas||""; previewValor(); abrirForm(); }
 $("gGuardar").onclick = async () => {
   const nombre=$("gNombre").value.trim(); if(nombre.length<2){ $("gNombre").focus(); return; }
@@ -562,7 +557,7 @@ $("pdfFam").onclick = () => {
   const f = miFam(), act = activos(), t = act.reduce((s,g)=>s+parteFam(g,f),0), a = act.reduce((s,g)=>s+abonadoFam(g,f),0);
   const doc = pdfBase(`Cuenta de la familia ${f.nombre}`, `${f.personas} invitados · le corresponde ${cop(t)} · abonado ${cop(a)} · saldo ${cop(t-a)}`);
   doc.autoTable({ ...estilo, startY:52, head:[["Gasto","Reparto","Total del gasto","Le toca","Abonó","Saldo"]],
-    body: act.map(g=>[g.nombre, {comun:"Partes iguales",invitados:"Por invitados",unitario:"Por persona"}[g.tipo], cop(totalGasto(g)), cop(parteFam(g,f)), cop(abonadoFam(g,f)), cop(parteFam(g,f)-abonadoFam(g,f))]),
+    body: act.map(g=>[g.nombre, g.tipo==="comun"?"Partes iguales":"Por invitados", cop(totalGasto(g)), cop(parteFam(g,f)), cop(abonadoFam(g,f)), cop(parteFam(g,f)-abonadoFam(g,f))]),
     columnStyles:{2:{halign:"right"},3:{halign:"right"},4:{halign:"right"},5:{halign:"right"}} });
   const abs = abonos.filter(x=>x.familia_id===f.id);
   if (abs.length) doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["Fecha","Abono a","Nota","Valor"]],
