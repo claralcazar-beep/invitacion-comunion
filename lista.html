@@ -125,7 +125,7 @@
             <option value="unitario">Valor por persona × invitados</option></select></div>
         </div>
         <div class="grid2">
-          <div><label id="lblValor">Valor total</label><input id="gValor" inputmode="numeric" placeholder="$ 0"></div>
+          <div><label id="lblValor">Valor total</label><input id="gValor" inputmode="numeric" placeholder="$ 0"><div class="meta" id="gPreview" style="margin-top:4px"></div></div>
           <div><label>Fecha de entrega / pago</label><input id="gFecha" type="date"></div>
         </div>
         <div class="grid2">
@@ -407,10 +407,18 @@ function abrirForm(){ $("formGasto").classList.remove("hide"); $("formGasto").sc
 function limpiarForm(){ ["gId","gNombre","gValor","gFecha","gProv","gCont","gEnc","gNotas"].forEach(i=>$(i).value=""); $("gCat").value="Otros"; $("gTipo").value="comun"; $("gEstado").value="pendiente"; $("formTitulo").textContent="Nuevo gasto o tarea"; }
 $("fabNuevo").onclick = () => { limpiarForm(); if(catSel) $("gCat").value = catSel; abrirForm(); };
 $("gCancelar").onclick = () => $("formGasto").classList.add("hide");
-$("gTipo").onchange = () => $("lblValor").textContent = $("gTipo").value==="unitario" ? "Valor por persona" : "Valor total";
-$("gValor").addEventListener("blur", () => { const v=num($("gValor").value); $("gValor").value = v ? cop(v) : ""; });
-function editarGasto(g){ limpiarForm(); $("formTitulo").textContent="Editar: "+g.nombre; $("gId").value=g.id; $("gNombre").value=g.nombre; $("gCat").value=g.categoria; $("gTipo").value=g.tipo; $("gTipo").onchange();
-  $("gValor").value=g.valor?cop(g.valor):""; $("gFecha").value=g.fecha_entrega||""; $("gProv").value=g.proveedor||""; $("gCont").value=g.contacto||""; $("gEnc").value=g.encargado||""; $("gEstado").value=g.estado; $("gNotas").value=g.notas||""; abrirForm(); }
+function previewValor(){
+  const v = num($("gValor").value), P = personasTotal();
+  $("lblValor").textContent = $("gTipo").value==="unitario" ? "Valor por persona" : "Valor total";
+  $("gPreview").innerHTML = !v ? "" : $("gTipo").value==="unitario"
+    ? `= ${cop(v)} × ${P} invitados = <b>${cop(v*P)}</b> en total`
+    : `Total del gasto: <b>${cop(v)}</b> (${$("gTipo").value==="comun" ? "se divide en 3 partes iguales" : "se reparte según los invitados de cada familia"})`;
+}
+$("gTipo").onchange = previewValor;
+$("gValor").addEventListener("input", previewValor);
+$("gValor").addEventListener("blur", () => { const v=num($("gValor").value); $("gValor").value = v ? cop(v) : ""; previewValor(); });
+function editarGasto(g){ limpiarForm(); $("formTitulo").textContent="Editar: "+g.nombre; $("gId").value=g.id; $("gNombre").value=g.nombre; $("gCat").value=g.categoria; $("gTipo").value=g.tipo;
+  $("gValor").value=g.valor?cop(g.valor):""; $("gFecha").value=g.fecha_entrega||""; $("gProv").value=g.proveedor||""; $("gCont").value=g.contacto||""; $("gEnc").value=g.encargado||""; $("gEstado").value=g.estado; $("gNotas").value=g.notas||""; previewValor(); abrirForm(); }
 $("gGuardar").onclick = async () => {
   const nombre=$("gNombre").value.trim(); if(nombre.length<2){ $("gNombre").focus(); return; }
   const fila={ id:$("gId").value||"", nombre, categoria:$("gCat").value, tipo:$("gTipo").value, valor:num($("gValor").value), fecha_entrega:$("gFecha").value||"",
