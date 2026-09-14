@@ -284,10 +284,12 @@ function parteFam(g, f){
 const abonadoGasto = g => abonos.filter(a=>a.gasto_id===g.id).reduce((s,a)=>s+ +a.valor,0);
 const abonadoFam = (g,f) => abonos.filter(a=>a.gasto_id===g.id && a.familia_id===f.id).reduce((s,a)=>s+ +a.valor,0);
 const activos = () => gastos.filter(g=>g.estado!=="cancelado");
-function confirmadosFam(f){   // personas confirmadas: respuestas web de esa familia + confirmaciones manuales de su lista
+function confirmadosFam(f){   // personas confirmadas: respuestas web + manuales SIN respuesta web (nunca se cuenta doble)
   const web = conf.filter(c=>c.asiste && (c.familia_id||1)===f.id);
   const ad = web.reduce((s,c)=>s+ +c.adultos,0), ni = web.reduce((s,c)=>s+ +c.ninos,0);
-  const man = inv.filter(i=>i.familia_id===f.id && i.confirmado===true).reduce((s,i)=>s+(+i.personas||1),0);
+  const tieneWeb = i => { const tel = dig(i.telefono), nom = norm(i.nombre);
+    return web.some(c => (tel && dig(c.telefono)===tel) || norm(c.nombre)===nom || (nom.length>6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre))))); };
+  const man = inv.filter(i=>i.familia_id===f.id && i.confirmado===true && !tieneWeb(i)).reduce((s,i)=>s+(+i.personas||1),0);
   return {familias:web.length, adultos:ad, ninos:ni, manual:man, personas:ad+ni+man};
 }
 function diasPara(d){ if(!d) return null; return Math.ceil((new Date(d+"T12:00:00") - new Date().setHours(12,0,0,0))/864e5); }
