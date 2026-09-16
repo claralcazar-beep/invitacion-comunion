@@ -180,6 +180,7 @@
           <button class="chip" data-f="env">Enviados</button>
           <button class="chip" data-f="sinresp">Sin respuesta</button>
           <button class="chip" data-f="conf">Confirmaron</button>
+          <button class="chip" data-f="doble">Dobles ✓</button>
         </div>
         <button class="btn ghost sm" id="pdfInv">PDF</button>
       </div>
@@ -230,7 +231,7 @@ function toast(t){ const x=$("toast"); x.textContent=t; x.classList.add("show");
 
 let clave = sessionStorage.getItem("clave") || "", famId = +sessionStorage.getItem("famId") || 1;
 const ICONO = {"Lugar":"🏡","Programa":"🎉","Almuerzo":"🍽️","Niños":"🧒","Mesa de dulces":"🍰","Decoración":"✨","Logística":"🪑","Otros":"📌"};
-let catSel = null;
+let catSel = null, editInv = null;
 let conf=[], inv=[], familias=[], gastos=[], abonos=[], fConf="si", fInv="todos", fPlan="todos", abierto=null;
 
 async function rpc(fn, args){ const {data, error} = await sb.rpc(fn, {clave, ...args}); if (error) throw error; return data; }
@@ -429,11 +430,11 @@ $("gGuardar").onclick = async () => {
 
 /* ================= INVITADOS ================= */
 function confirmacionDe(i){
-  if (i.confirmado===true || i.confirmado===false) return {manual:true, asiste:i.confirmado, adultos:i.personas||0, ninos:0};
   const mias = conf.filter(c=>(c.familia_id||1)===i.familia_id);
   const tel = dig(i.telefono), nom = norm(i.nombre);
   return mias.find(c => (tel && dig(c.telefono) === tel)) || mias.find(c => norm(c.nombre) === nom) ||
-         mias.find(c => nom.length > 6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre)))) || null;
+         mias.find(c => nom.length > 6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre)))) ||
+         ((i.confirmado===true || i.confirmado===false) ? {manual:true, asiste:i.confirmado, adultos:i.personas||0, ninos:0} : null);
 }
 function pintarInv(){
   const mios = inv.filter(i=>i.familia_id===famId).map(i => ({...i, c: confirmacionDe(i)}));
@@ -445,21 +446,31 @@ function pintarInv(){
     <div class="stat"><b>${confs.length}</b><small>Confirmaron</small></div>
     <div class="stat"><b>${personas}</b><small>Personas conf.</small></div>`;
   $("famNombreInv").textContent = miFam().nombre;
-  const lista = mios.filter(f => fInv==="todos" || (fInv==="pend" && !f.enviado) || (fInv==="env" && f.enviado) || (fInv==="sinresp" && f.enviado && !f.c) || (fInv==="conf" && f.c));
+  const lista = mios.filter(f => fInv==="todos" || (fInv==="pend" && !f.enviado) || (fInv==="env" && f.enviado) || (fInv==="sinresp" && f.enviado && !f.c) || (fInv==="conf" && f.c) || (fInv==="doble" && f.c && !f.c.manual && f.confirmado===true));
   $("listaInv").innerHTML = lista.length ? lista.map(f => {
-    const estado = f.c ? (f.c.asiste ? `<span class="pill">Confirmó${f.c.manual?"":` · ${f.c.adultos} ad · ${f.c.ninos} ni`}</span>` : `<span class="pill no">No asiste</span>`)
+    if (editInv === f.id) return `<div class="card">
+      <div class="k">Editar invitado</div>
+      <label class="k" style="margin-top:10px;display:block">Nombre</label><input id="eiNombre" value="${esc(f.nombre)}">
+      <label class="k" style="margin-top:8px;display:block">Celular</label><input id="eiTel" inputmode="tel" value="${esc(f.telefono||"")}">
+      <label class="k" style="margin-top:8px;display:block">Notas</label><input id="eiNotas" value="${esc(f.notas||"")}">
+      <div class="acts"><button class="btn sm" data-eisave="${f.id}">Guardar</button><button class="lnk" data-eicancel="1">Cancelar</button></div></div>`;
+    const doble = f.c && !f.c.manual && f.confirmado===true;
+    const estado = f.c ? (f.c.asiste ? `<span class="pill">Confirmó${f.c.manual?"":` · ${f.c.adultos} ad · ${f.c.ninos} ni`}</span>${doble?`<span class="pill gold" title="Ya confirmó por la web; la casilla manual no suma">Doble ✓</span>`:""}` : `<span class="pill no">No asiste</span>`)
                        : (f.enviado ? `<span class="pill wait">Sin respuesta</span>` : `<span class="pill gold">Por enviar</span>`);
     const tel = f.telefono ? ` · <a href="https://wa.me/57${dig(f.telefono)}" target="_blank" rel="noopener">${esc(f.telefono)}</a>` : "";
     return `<div class="card">
-      <div class="row"><div class="name">${esc(f.nombre)}</div>${estado}</div>
+      <div class="row"><div class="name">${esc(f.nombre)}</div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${estado}</div></div>
       <div class="meta">${tel?tel.slice(3):""}${f.notas?` · ${esc(f.notas)}`:""}</div>
+      ${doble?`<div class="meta" style="color:var(--oro);font-weight:700">Ya confirmó por la web: puedes desmarcar la casilla, no altera el conteo.</div>`:""}
       <div class="acts">
         <label class="check"><input type="checkbox" data-env="${f.id}" ${f.enviado?"checked":""}> Enviada</label>
-        <label class="check"><input type="checkbox" data-conf="${f.id}" ${f.c&&f.c.asiste?"checked":""}> Confirmó</label>
+        <label class="check"><input type="checkbox" data-conf="${f.id}" ${(f.c&&f.c.asiste&&(f.c.manual||f.confirmado===true))||f.confirmado===true?"checked":""}> Confirmó</label>
         <input class="fam-personas" data-pers="${f.id}" value="${f.personas??""}" placeholder="pers." inputmode="numeric" title="Personas que vienen">
+        <button class="lnk" data-eiedit="${f.id}">Editar</button>
         <button class="lnk del" data-id="${f.id}" data-n="${esc(f.nombre)}">Eliminar</button>
       </div></div>`; }).join("") : `<div class="empty">Nada en esta vista.</div>`;
 }
+
 $("filtroInv").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fInv=b.dataset.f;
   $("filtroInv").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintarInv(); };
 $("listaInv").addEventListener("change", async e => {
@@ -471,6 +482,15 @@ $("listaInv").addEventListener("change", async e => {
     await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, personas:it.personas??""}}); pintarInv(); }
 });
 $("listaInv").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-eiedit]"); if (ed){ editInv = +ed.dataset.eiedit; pintarInv(); return; }
+  if (e.target.closest("[data-eicancel]")){ editInv = null; pintarInv(); return; }
+  const sv = e.target.closest("[data-eisave]");
+  if (sv){ const it = inv.find(i=>i.id===+sv.dataset.eisave);
+    const nombre=$("eiNombre").value.trim(), telefono=$("eiTel").value.trim(), notas=$("eiNotas").value.trim();
+    if (nombre.length<2){ $("eiNombre").focus(); return; }
+    const ok = await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, nombre, telefono, notas}});
+    if(!ok){ toast("No se pudo guardar. ¿Corriste supabase-editar-invitado.sql?"); return; }
+    it.nombre=nombre; it.telefono=telefono||null; it.notas=notas||null; editInv=null; pintarInv(); pintarConf(); toast("Guardado"); return; }
   const b = e.target.closest(".del"); if(!b) return;
   if(!confirm(`¿Eliminar a ${b.dataset.n} de la lista?`)) return;
   if(await rpc("eliminar_invitado",{fila:+b.dataset.id})){ inv = inv.filter(i=>i.id!==+b.dataset.id); pintarInv(); pintarPlan(); } else toast("No se pudo eliminar");
