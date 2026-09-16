@@ -290,8 +290,12 @@ function confirmadosFam(f){   // personas confirmadas: respuestas web + manuales
   const ad = web.reduce((s,c)=>s+ +c.adultos,0), ni = web.reduce((s,c)=>s+ +c.ninos,0);
   const tieneWeb = i => { const tel = dig(i.telefono), nom = norm(i.nombre);
     return web.some(c => (tel && dig(c.telefono)===tel) || norm(c.nombre)===nom || (nom.length>6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre))))); };
-  const man = inv.filter(i=>i.familia_id===f.id && i.confirmado===true && !tieneWeb(i)).reduce((s,i)=>s+(+i.personas||1),0);
-  return {familias:web.length, adultos:ad, ninos:ni, manual:man, personas:ad+ni+man};
+  let mAd = 0, mNi = 0;
+  for (const i of inv.filter(x=>x.familia_id===f.id && x.confirmado===true && !tieneWeb(x))){
+    const a = +(i.adultos ?? i.personas) || 0, n = +i.ninos || 0;
+    if (a+n === 0) mAd += 1; else { mAd += a; mNi += n; }
+  }
+  return {familias:web.length, adultos:ad+mAd, ninos:ni+mNi, manual:mAd+mNi, personas:ad+ni+mAd+mNi};
 }
 function diasPara(d){ if(!d) return null; return Math.ceil((new Date(d+"T12:00:00") - new Date().setHours(12,0,0,0))/864e5); }
 
@@ -434,12 +438,12 @@ function confirmacionDe(i){
   const tel = dig(i.telefono), nom = norm(i.nombre);
   return mias.find(c => (tel && dig(c.telefono) === tel)) || mias.find(c => norm(c.nombre) === nom) ||
          mias.find(c => nom.length > 6 && (norm(c.nombre).includes(nom) || nom.includes(norm(c.nombre)))) ||
-         ((i.confirmado===true || i.confirmado===false) ? {manual:true, asiste:i.confirmado, adultos:i.personas||0, ninos:0} : null);
+         ((i.confirmado===true || i.confirmado===false) ? {manual:true, asiste:i.confirmado, adultos:(i.adultos ?? i.personas) || 0, ninos:i.ninos || 0} : null);
 }
 function pintarInv(){
   const mios = inv.filter(i=>i.familia_id===famId).map(i => ({...i, c: confirmacionDe(i)}));
   const env = mios.filter(f=>f.enviado), confs = mios.filter(f=>f.c && f.c.asiste), sinresp = mios.filter(f=>f.enviado && !f.c);
-  const personas = confs.reduce((s,f)=>s+(f.c.manual ? (f.personas||1) : (+f.c.adultos + +f.c.ninos)),0);
+  const personas = confs.reduce((s,f)=>s+((+f.c.adultos + +f.c.ninos) || 1),0);
   $("statsInv").innerHTML = `
     <div class="stat total"><b>${mios.length}</b><small>Invitados</small></div>
     <div class="stat"><b>${env.length}</b><small>Enviados</small></div>
@@ -465,7 +469,8 @@ function pintarInv(){
       <div class="acts">
         <label class="check"><input type="checkbox" data-env="${f.id}" ${f.enviado?"checked":""}> Enviada</label>
         <label class="check"><input type="checkbox" data-conf="${f.id}" ${(f.c&&f.c.asiste&&(f.c.manual||f.confirmado===true))||f.confirmado===true?"checked":""}> Confirmó</label>
-        <input class="fam-personas" data-pers="${f.id}" value="${f.personas??""}" placeholder="pers." inputmode="numeric" title="Personas que vienen">
+        <input class="fam-personas" data-ad="${f.id}" value="${f.adultos ?? f.personas ?? ""}" placeholder="ad." inputmode="numeric" title="Adultos que vienen">
+        <input class="fam-personas" data-ni="${f.id}" value="${f.ninos ?? ""}" placeholder="ni." inputmode="numeric" title="Niños que vienen">
         <button class="lnk" data-eiedit="${f.id}">Editar</button>
         <button class="lnk del" data-id="${f.id}" data-n="${esc(f.nombre)}">Eliminar</button>
       </div></div>`; }).join("") : `<div class="empty">Nada en esta vista.</div>`;
@@ -478,8 +483,10 @@ $("listaInv").addEventListener("change", async e => {
   if (t.dataset.env){ const ok = await rpc("marcar_enviado",{fila:+t.dataset.env, valor:t.checked}); if(!ok){ t.checked=!t.checked; toast("No se pudo guardar"); return; } inv.find(i=>i.id===+t.dataset.env).enviado=t.checked; pintarInv(); }
   if (t.dataset.conf){ const it=inv.find(i=>i.id===+t.dataset.conf); it.confirmado = t.checked ? true : null;
     await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, confirmado:it.confirmado}}); pintarInv(); }
-  if (t.dataset.pers){ const it=inv.find(i=>i.id===+t.dataset.pers); it.personas = num(t.value)||null;
-    await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, personas:it.personas??""}}); pintarInv(); }
+  if (t.dataset.ad){ const it=inv.find(i=>i.id===+t.dataset.ad); it.adultos = num(t.value)||null;
+    await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, adultos:it.adultos??""}}); pintarInv(); pintarConf(); }
+  if (t.dataset.ni){ const it=inv.find(i=>i.id===+t.dataset.ni); it.ninos = num(t.value)||null;
+    await rpc("plan_guardar",{tabla:"invitados", fila:{id:it.id, ninos:it.ninos??""}}); pintarInv(); pintarConf(); }
 });
 $("listaInv").addEventListener("click", async e => {
   const ed = e.target.closest("[data-eiedit]"); if (ed){ editInv = +ed.dataset.eiedit; pintarInv(); return; }
@@ -512,10 +519,10 @@ $("importarBtn").onclick = async () => {
 /* ================= CONFIRMACIONES ================= */
 function pintarConf(){
   const mi = miFam();
-  $("tablaConfTot").innerHTML = `<tr><th>Familia</th><th class="r">Respuestas</th><th class="r">Adultos</th><th class="r">Niños</th><th class="r">Manual</th><th class="r">Personas</th></tr>` +
-    familias.map(f=>{const c=confirmadosFam(f);return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}</td><td class="r">${c.familias}</td><td class="r">${c.adultos}</td><td class="r">${c.ninos}</td><td class="r">${c.manual}</td><td class="r"><b>${c.personas}</b></td></tr>`}).join("") +
-    (()=>{const T=familias.map(confirmadosFam);return `<tr><td><b>Total</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.familias,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.adultos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.ninos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.manual,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.personas,0)}</b></td></tr>`})();
-  $("confTitulo").innerHTML = `Respuestas recibidas por la página de confirmación de la familia <b>${esc(mi.nombre)}</b>. "Manual" son los marcados a mano en la lista de invitados.`;
+  $("tablaConfTot").innerHTML = `<tr><th>Familia</th><th class="r">Respuestas web</th><th class="r">Adultos</th><th class="r">Niños</th><th class="r">Personas</th></tr>` +
+    familias.map(f=>{const c=confirmadosFam(f);return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}</td><td class="r">${c.familias}</td><td class="r">${c.adultos}</td><td class="r">${c.ninos}</td><td class="r"><b>${c.personas}</b></td></tr>`}).join("") +
+    (()=>{const T=familias.map(confirmadosFam);return `<tr><td><b>Total</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.familias,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.adultos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.ninos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.personas,0)}</b></td></tr>`})();
+  $("confTitulo").innerHTML = `Respuestas recibidas por la página de confirmación de la familia <b>${esc(mi.nombre)}</b>. Los totales incluyen a los confirmados a mano en la lista de invitados (con sus adultos y niños).`;
   const mias = conf.filter(c=>(c.familia_id||1)===famId);
   const si = mias.filter(d=>d.asiste), no = mias.filter(d=>!d.asiste);
   const ad = si.reduce((a,d)=>a+d.adultos,0), ni = si.reduce((a,d)=>a+d.ninos,0);
@@ -597,15 +604,15 @@ $("pdfConf").onclick = () => {
     columnStyles:{0:{cellWidth:8},3:{halign:"center",cellWidth:16},4:{halign:"center",cellWidth:14},6:{cellWidth:26}} });
   if (no.length) doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["No asisten","Celular","Mensaje"]], body: no.map(d=>[d.nombre,d.telefono||"",d.mensaje||""]) });
   const T=familias.map(f=>({f,c:confirmadosFam(f)}));
-  doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["Totales de las tres familias","Respuestas","Adultos","Niños","Manual","Personas"]],
-    body:[...T.map(x=>[x.f.nombre,x.c.familias,x.c.adultos,x.c.ninos,x.c.manual,x.c.personas]),["Total",T.reduce((s,x)=>s+x.c.familias,0),T.reduce((s,x)=>s+x.c.adultos,0),T.reduce((s,x)=>s+x.c.ninos,0),T.reduce((s,x)=>s+x.c.manual,0),T.reduce((s,x)=>s+x.c.personas,0)]] });
+  doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["Totales de las tres familias","Respuestas web","Adultos","Niños","Personas"]],
+    body:[...T.map(x=>[x.f.nombre,x.c.familias,x.c.adultos,x.c.ninos,x.c.personas]),["Total",T.reduce((s,x)=>s+x.c.familias,0),T.reduce((s,x)=>s+x.c.adultos,0),T.reduce((s,x)=>s+x.c.ninos,0),T.reduce((s,x)=>s+x.c.personas,0)]] });
   pie(doc); doc.save(`confirmados-${norm(miFam().nombre)}.pdf`);
 };
 $("pdfInv").onclick = () => {
   const f = miFam(), filas = inv.filter(i=>i.familia_id===famId).map(i=>({...i,c:confirmacionDe(i)}));
   const doc = pdfBase(`Invitados de la familia ${f.nombre} · checklist`, `${filas.length} invitados · ${filas.filter(x=>x.enviado).length} enviados · ${filas.filter(x=>x.c&&x.c.asiste).length} confirmaron · ${filas.filter(x=>x.enviado&&!x.c).length} sin respuesta`);
   doc.autoTable({ ...estilo, startY:52, head:[["#","Invitado","Celular","Enviada","Estado","Personas"]],
-    body: filas.map((x,k)=>[k+1, x.nombre, x.telefono||"", x.enviado?"Sí":"", x.c?(x.c.asiste?"Confirmó":"No asiste"):(x.enviado?"Sin respuesta":"Por enviar"), x.c&&x.c.asiste?(x.c.manual?(x.personas||""):`${x.c.adultos} ad · ${x.c.ninos} ni`):""]),
+    body: filas.map((x,k)=>[k+1, x.nombre, x.telefono||"", x.enviado?"Sí":"", x.c?(x.c.asiste?"Confirmó":"No asiste"):(x.enviado?"Sin respuesta":"Por enviar"), x.c&&x.c.asiste?`${x.c.adultos} ad · ${x.c.ninos} ni`:""]),
     columnStyles:{0:{cellWidth:8},3:{halign:"center",cellWidth:18},4:{cellWidth:28},5:{cellWidth:24}} });
   pie(doc); doc.save(`invitados-${norm(f.nombre).replace(/\s+/g,"-")}.pdf`);
 };
