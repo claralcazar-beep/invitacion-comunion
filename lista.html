@@ -286,6 +286,8 @@ function parteFam(g, f){
   return P ? +g.valor*(+f.personas||0)/P : +g.valor/n;   // invitados (y cualquier tipo viejo)
 }
 const abonadoGasto = g => abonos.filter(a=>a.gasto_id===g.id).reduce((s,a)=>s+ +a.valor,0);
+const aporteTotal = () => abonos.reduce((s,a)=>s+ +a.valor,0);
+const aporteFam = f => abonos.filter(a=>a.familia_id===f.id).reduce((s,a)=>s+ +a.valor,0);
 const abonadoFam = (g,f) => abonos.filter(a=>a.gasto_id===g.id && a.familia_id===f.id).reduce((s,a)=>s+ +a.valor,0);
 const activos = () => gastos.filter(g=>g.estado!=="cancelado");
 function confirmadosFam(f){   // personas confirmadas: respuestas web + manuales SIN respuesta web (nunca se cuenta doble)
@@ -304,15 +306,15 @@ function confirmadosFam(f){   // personas confirmadas: respuestas web + manuales
 function diasPara(d){ if(!d) return null; return Math.ceil((new Date(d+"T12:00:00") - new Date().setHours(12,0,0,0))/864e5); }
 
 function pintarPlan(){
-  const act = activos(), tot = act.reduce((s,g)=>s+totalGasto(g),0), ab = act.reduce((s,g)=>s+abonadoGasto(g),0);
-  const mi = miFam(), miTot = act.reduce((s,g)=>s+parteFam(g,mi),0), miAb = act.reduce((s,g)=>s+abonadoFam(g,mi),0);
+  const act = activos(), tot = act.reduce((s,g)=>s+totalGasto(g),0), ab = aporteTotal();
+  const mi = miFam(), miTot = act.reduce((s,g)=>s+parteFam(g,mi),0), miAb = aporteFam(mi);
   $("statsPlan").innerHTML = `
     <div class="stat total"><b>${cop(tot)}</b><small>Total evento</small></div>
     <div class="stat"><b>${cop(ab)}</b><small>Abonado</small></div>
     <div class="stat ${tot-ab>0?"alert":""}"><b>${cop(tot-ab)}</b><small>Saldo</small></div>
     <div class="stat"><b>${cop(miTot-miAb)}</b><small>Mi saldo</small></div>`;
   $("tablaFam").innerHTML = `<tr><th>Familia</th><th class="r">Invitados</th><th class="r">Le toca</th><th class="r">Abonó</th><th class="r">Saldo</th></tr>` +
-    familias.map(f => { const t=act.reduce((s,g)=>s+parteFam(g,f),0), a=act.reduce((s,g)=>s+abonadoFam(g,f),0);
+    familias.map(f => { const t=act.reduce((s,g)=>s+parteFam(g,f),0), a=aporteFam(f);
       return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}<br><small style="color:#5a6656;font-weight:400">${f.ninos} niño${f.ninos!==1?"s":""} · ${inv.filter(i=>i.familia_id===f.id).length} en lista</small></td>
         <td class="r"><input class="fam-personas" data-id="${f.id}" value="${f.personas}" inputmode="numeric"><br><button class="lnk" data-usar="${f.id}" style="font-size:.66rem">usar confirmados (${confirmadosFam(f).personas})</button></td>
         <td class="r">${cop(t)}</td><td class="r">${cop(a)}</td><td class="r" style="color:${t-a>0?"var(--rojo)":"var(--hoja)"}">${cop(t-a)}</td></tr>`; }).join("") +
@@ -372,6 +374,7 @@ function tarjetaGasto(g){
     <div class="row"><div class="name">${esc(g.nombre)}</div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${venc}${est}</div></div>
     <div class="meta">${tipo}${g.proveedor?` · ${esc(g.proveedor)}`:""}${cont}${enc}</div>
     ${g.notas?`<div class="meta" style="font-style:italic">${esc(g.notas)}</div>`:""}
+    ${g.estado==="cancelado" && ab>0 ? `<div class="meta" style="color:var(--rojo);font-weight:700">Gasto cancelado con abonos por ${cop(ab)}: siguen contando como aporte de quien pagó.</div>` : ""}
     <div class="money"><div><b>${cop(tot)}</b><small>Total</small></div><div class="ok"><b>${cop(ab)}</b><small>Abonado</small></div><div class="${saldo>0.5?"neg":"ok"}"><b>${cop(saldo)}</b><small>Saldo</small></div></div>
     <div class="acts"><span class="meta">A ${esc(mi.nombre)} le toca <b>${cop(parteFam(g,mi))}</b></span><button class="lnk" data-open="${g.id}">${abierto===g.id?"Cerrar":"Detalle · abonos"}</button></div>
     ${det}</div>`;
@@ -635,9 +638,9 @@ const estTxt = {pendiente:"Pendiente",contratado:"Contratado",entregado:"Listo",
 
 $("pdfPlan").onclick = () => {
   const act = activos(), tot = act.reduce((s,g)=>s+totalGasto(g),0), ab = act.reduce((s,g)=>s+abonadoGasto(g),0);
-  const doc = pdfBase("Plan y presupuesto", `Total ${cop(tot)} · abonado ${cop(ab)} · saldo ${cop(tot-ab)} · ${personasTotal()} invitados`);
+  const doc = pdfBase("Plan y presupuesto", `Total ${cop(tot)} · aportado ${cop(ab)} · saldo ${cop(tot-ab)} · ${personasTotal()} invitados`);
   doc.autoTable({ ...estilo, startY:52, head:[["Familia","Invitados","Le toca","Abonó","Saldo"]],
-    body: familias.map(f=>{const t=act.reduce((s,g)=>s+parteFam(g,f),0),a=act.reduce((s,g)=>s+abonadoFam(g,f),0);return [f.nombre,f.personas,cop(t),cop(a),cop(t-a)];}),
+    body: familias.map(f=>{const t=act.reduce((s,g)=>s+parteFam(g,f),0),a=aporteFam(f);return [f.nombre,f.personas,cop(t),cop(a),cop(t-a)];}),
     columnStyles:{1:{halign:"center"},2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}} });
   let y = doc.lastAutoTable.finalY + 8;
   for (const c of CATS){ const grupo = gastos.filter(g=>g.categoria===c); if(!grupo.length) continue;
@@ -652,7 +655,7 @@ $("pdfPlan").onclick = () => {
   pie(doc); doc.save("plan-primera-comunion.pdf");
 };
 $("pdfFam").onclick = () => {
-  const f = miFam(), act = activos(), t = act.reduce((s,g)=>s+parteFam(g,f),0), a = act.reduce((s,g)=>s+abonadoFam(g,f),0);
+  const f = miFam(), act = activos(), t = act.reduce((s,g)=>s+parteFam(g,f),0), a = aporteFam(f);
   const doc = pdfBase(`Cuenta de la familia ${f.nombre}`, `${f.personas} invitados · le corresponde ${cop(t)} · abonado ${cop(a)} · saldo ${cop(t-a)}`);
   doc.autoTable({ ...estilo, startY:52, head:[["Gasto","Reparto","Total del gasto","Le toca","Abonó","Saldo"]],
     body: act.map(g=>[g.nombre, g.tipo==="comun"?"Partes iguales":"Por invitados", cop(totalGasto(g)), cop(parteFam(g,f)), cop(abonadoFam(g,f)), cop(parteFam(g,f)-abonadoFam(g,f))]),
