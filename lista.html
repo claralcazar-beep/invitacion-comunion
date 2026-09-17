@@ -205,6 +205,7 @@
         <button class="btn ghost sm" id="refrescar">Actualizar</button>
       </div>
       <div id="listaConf"></div>
+      <div class="box" id="ajusteBox" style="margin-top:2px"></div>
       <div id="listaMan"></div>
     </div>
   </div>
@@ -228,6 +229,7 @@ const dig = t => String(t ?? "").replace(/\D/g,"").slice(-10);
 const norm = t => String(t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
 const cop = n => "$ " + Math.round(n||0).toLocaleString("es-CO");
 const num = s => +String(s||"").replace(/[^\d]/g,"") || 0;
+const numS = s => { const v = parseInt(String(s||"").replace(/[^\d-]/g,""),10); return isNaN(v) ? 0 : v; };
 function toast(t){ const x=$("toast"); x.textContent=t; x.classList.add("show"); setTimeout(()=>x.classList.remove("show"),1800); }
 
 let clave = sessionStorage.getItem("clave") || "", famId = +sessionStorage.getItem("famId") || 1;
@@ -296,7 +298,8 @@ function confirmadosFam(f){   // personas confirmadas: respuestas web + manuales
     const a = +(i.adultos ?? i.personas) || 0, n = +i.ninos || 0;
     if (a+n === 0) mAd += 1; else { mAd += a; mNi += n; }
   }
-  return {familias:web.length, adultos:ad+mAd, ninos:ni+mNi, manual:mAd+mNi, personas:ad+ni+mAd+mNi};
+  const ajA = +f.aj_adultos || 0, ajN = +f.aj_ninos || 0;
+  return {familias:web.length, adultos:ad+mAd+ajA, ninos:ni+mNi+ajN, manual:mAd+mNi, ajuste:ajA+ajN, personas:ad+ni+mAd+mNi+ajA+ajN};
 }
 function diasPara(d){ if(!d) return null; return Math.ceil((new Date(d+"T12:00:00") - new Date().setHours(12,0,0,0))/864e5); }
 
@@ -523,7 +526,14 @@ function pintarConf(){
   $("tablaConfTot").innerHTML = `<tr><th>Familia</th><th class="r">Respuestas web</th><th class="r">Adultos</th><th class="r">Niños</th><th class="r">Personas</th></tr>` +
     familias.map(f=>{const c=confirmadosFam(f);return `<tr class="${f.id===famId?"me":""}"><td>${esc(f.nombre)}</td><td class="r">${c.familias}</td><td class="r">${c.adultos}</td><td class="r">${c.ninos}</td><td class="r"><b>${c.personas}</b></td></tr>`}).join("") +
     (()=>{const T=familias.map(confirmadosFam);return `<tr><td><b>Total</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.familias,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.adultos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.ninos,0)}</b></td><td class="r"><b>${T.reduce((s,c)=>s+c.personas,0)}</b></td></tr>`})();
-  $("confTitulo").innerHTML = `Respuestas recibidas por la página de confirmación de la familia <b>${esc(mi.nombre)}</b>. Los totales incluyen a los confirmados a mano en la lista de invitados (con sus adultos y niños).`;
+  $("confTitulo").innerHTML = `Respuestas recibidas por la página de confirmación de la familia <b>${esc(mi.nombre)}</b>. Los totales incluyen a los confirmados a mano y el ajuste manual.`;
+  $("ajusteBox").innerHTML = `<div class="k">Ajuste manual de ${esc(mi.nombre)} · si tu conteo real difiere, corrígelo aquí (usa negativos para restar)</div>
+    <div style="display:flex;gap:10px;align-items:end;margin-top:8px;flex-wrap:wrap">
+      <div><label class="k">± Adultos</label><input class="fam-personas" id="ajAd" value="${mi.aj_adultos||0}" inputmode="numeric" style="width:74px"></div>
+      <div><label class="k">± Niños</label><input class="fam-personas" id="ajNi" value="${mi.aj_ninos||0}" inputmode="numeric" style="width:74px"></div>
+      <button class="btn sm" id="ajGuardar">Aplicar</button>
+      <span class="meta">Ej.: escribe -3 en adultos si sabes que sobran 3.</span>
+    </div>`;
   const mias = conf.filter(c=>(c.familia_id||1)===famId);
   const si = mias.filter(d=>d.asiste), no = mias.filter(d=>!d.asiste);
   const ad = si.reduce((a,d)=>a+d.adultos,0), ni = si.reduce((a,d)=>a+d.ninos,0);
@@ -570,6 +580,13 @@ function pintarConf(){
 $("filtroConf").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; fConf=b.dataset.f;
   $("filtroConf").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintarConf(); };
 $("refrescar").onclick = async () => { await cargarTodo(); pintarFams(); pintarPlan(); pintarInv(); pintarConf(); toast("Actualizado"); };
+document.getElementById("tabConf").addEventListener("click", async e => {
+  if (e.target.id !== "ajGuardar") return;
+  const f = miFam(); f.aj_adultos = numS($("ajAd").value); f.aj_ninos = numS($("ajNi").value);
+  const ok = await rpc("plan_guardar",{tabla:"familias", fila:{id:f.id, aj_adultos:f.aj_adultos, aj_ninos:f.aj_ninos}});
+  if(!ok){ toast("No se pudo guardar. ¿Corriste supabase-ajuste-manual.sql?"); return; }
+  pintarConf(); pintarPlan(); toast("Ajuste aplicado");
+});
 $("listaMan").addEventListener("click", async e => {
   const q = e.target.closest("[data-quitar]"); if(!q) return;
   if(!confirm(`Quitar a ${q.dataset.n} del conteo (se desmarca su casilla Confirmó). ¿Continuar?`)) return;
