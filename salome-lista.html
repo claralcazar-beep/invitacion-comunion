@@ -7,12 +7,12 @@
 <title>Confirmaciones · Salomé</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=Great+Vibes&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{--oro:#C9A24B;--oro-claro:#E6CA85;--oro-osc:#A8822F;--cafe:#6B3A4C;--crema:#FCF3F2;--beige:#F8E4E2;--arena:#E6C3C0;--tinta:#432737;--rojo:#8a3b2a;--verde:#5E7A4C}
+  :root{--oro:#C9A24B;--oro-claro:#E6CA85;--oro-osc:#A8822F;--cafe:#7A4E3B;--crema:#FFF9F7;--beige:#FBEDEA;--arena:#F0D4D0;--tinta:#5C3A2E;--rojo:#8a3b2a;--verde:#5E7A4C}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Karla,system-ui,sans-serif;background:var(--crema);color:var(--tinta);line-height:1.45}
   .wrap{width:min(100%,560px);margin:0 auto;padding:20px 16px 80px}
   h1{font-family:'Great Vibes',cursive;font-weight:400;color:var(--oro-osc);font-size:3rem;line-height:1}
-  .sub{font-family:Fraunces,serif;font-style:italic;font-weight:300;color:#9A6E7C;margin-top:2px}
+  .sub{font-family:Fraunces,serif;font-style:italic;font-weight:300;color:#A07A6B;margin-top:2px}
   .k{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--oro-osc);font-weight:700}
   input,textarea{width:100%;padding:11px 13px;border:1px solid var(--arena);border-radius:12px;background:#fff;font:inherit;font-size:1rem;color:var(--tinta)}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:999px;border:1px solid var(--cafe);background:var(--cafe);color:var(--crema);font:inherit;font-weight:700;font-size:.88rem;cursor:pointer;text-decoration:none;white-space:nowrap}
@@ -35,13 +35,13 @@
   .name{font-family:Fraunces,serif;font-weight:600;font-size:1.1rem;color:var(--cafe);line-height:1.15}
   .pill{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--oro-claro);color:var(--cafe);white-space:nowrap}
   .pill.no{background:var(--arena)}
-  .meta{font-size:.84rem;color:#9A6E7C;margin-top:5px}
+  .meta{font-size:.84rem;color:#A07A6B;margin-top:5px}
   .meta a{color:var(--cafe);font-weight:700;text-decoration:none}
   .quote-msg{font-style:italic;border-left:3px solid var(--oro);padding-left:10px;margin-top:8px}
   .acts{margin-top:10px;display:flex;gap:14px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
   .lnk{background:transparent;border:0;color:var(--cafe);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
   .lnk.del{color:var(--rojo);font-weight:400} .lnk.gold{color:var(--oro-osc)}
-  .empty{text-align:center;color:#9A6E7C;padding:36px 0;font-family:Fraunces,serif;font-style:italic}
+  .empty{text-align:center;color:#A07A6B;padding:36px 0;font-family:Fraunces,serif;font-style:italic}
   .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
   .hide{display:none}
@@ -169,13 +169,13 @@ $("pdf").onclick = () => {
   const si = conf.filter(d=>d.asiste), no = conf.filter(d=>!d.asiste);
   const ad = si.reduce((a,d)=>a+ +d.adultos,0), ni = si.reduce((a,d)=>a+ +d.ninos,0);
   const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:"mm", format:"a4"});
-  doc.setFillColor(107,58,76); doc.rect(0,0,210,30,"F");
+  doc.setFillColor(122,78,59); doc.rect(0,0,210,30,"F");
   doc.setTextColor(230,202,133); doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.text("Primera Comunión · Salomé Romero Peralta", 14, 13);
   doc.setTextColor(251,246,236); doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text("Sábado 5 de diciembre de 2026 · 1:30 p. m. · Finca Jacaranda, Llanos del Combeima", 14, 20);
-  doc.setTextColor(107,58,76); doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.text("Lista de confirmados", 14, 40);
-  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(154,106,118);
+  doc.setTextColor(122,78,59); doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.text("Lista de confirmados", 14, 40);
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(160,122,107);
   doc.text(`${si.length} respuestas · ${ad} adultos · ${ni} niños · ${ad+ni} personas · ${no.length} no asisten`, 14, 46);
-  const estilo = { headStyles:{fillColor:[107,58,76], textColor:[230,202,133]}, alternateRowStyles:{fillColor:[248,228,226]}, styles:{font:"helvetica", fontSize:8.5, cellPadding:2.2}, margin:{left:14,right:14} };
+  const estilo = { headStyles:{fillColor:[122,78,59], textColor:[230,202,133]}, alternateRowStyles:{fillColor:[251,237,234]}, styles:{font:"helvetica", fontSize:8.5, cellPadding:2.2}, margin:{left:14,right:14} };
   doc.autoTable({ ...estilo, startY:52, head:[["#","Nombre","Celular","Adultos","Niños","Mensaje","Fecha"]],
     body: si.map((d,k)=>[k+1, d.nombre, d.telefono||"", d.adultos, d.ninos, d.mensaje||"", fecha(d.creado_en)]),
     columnStyles:{0:{cellWidth:8},3:{halign:"center",cellWidth:16},4:{halign:"center",cellWidth:14},6:{cellWidth:26}} });
