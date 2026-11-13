@@ -115,6 +115,19 @@
   .parents b{display:block;font-style:normal;font-family:var(--display);font-weight:600;color:var(--cafe);margin-top:4px}
   footer{padding:24px;text-align:center;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--lirio)}
 
+  /* ---------- Pantalla de bienvenida ---------- */
+  .welcome{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:30px 24px;background:#FFF1ED;transition:opacity .9s}
+  .welcome .wbg{position:absolute;inset:-40px;background:url(assets/familia-salome.jpg) center/cover no-repeat;filter:blur(30px) brightness(1.05) saturate(.85);opacity:.4}
+  .welcome .wveil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,241,237,.78),rgba(255,241,237,.94))}
+  .welcome .win{position:relative}
+  .welcome.out{opacity:0;pointer-events:none}
+  body.locked{overflow:hidden;height:100svh}
+  .welcome .name{font-size:clamp(3.6rem,18vw,5.2rem)}
+  .welcome .btnAbrir{display:inline-block;margin-top:26px;padding:16px 40px;border-radius:999px;border:0;background:var(--oro);color:#fff;
+    font:inherit;font-weight:700;font-size:1.05rem;cursor:pointer;box-shadow:0 14px 30px -12px rgba(168,130,47,.55)}
+  .welcome .hint{margin-top:20px;font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;color:var(--oro-osc);font-weight:700}
+
   /* ---------- Música ---------- */
   .music{position:fixed;right:16px;bottom:16px;z-index:50;width:50px;height:50px;border-radius:50%;border:1px solid var(--oro);background:var(--cafe);color:var(--oro-claro);
     display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
@@ -128,7 +141,22 @@
   :focus-visible{outline:3px solid var(--oro);outline-offset:3px}
 </style>
 </head>
-<body>
+<body class="locked">
+
+<!-- ===================== BIENVENIDA ===================== -->
+<div class="welcome" id="welcome">
+  <div class="wbg" aria-hidden="true"></div>
+  <div class="wveil" aria-hidden="true"></div>
+  <div class="win">
+    <svg class="cross" style="margin:0 auto 18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 2v20M5 8h14"/><circle cx="12" cy="8" r="3.2" fill="#FFF1ED"/></svg>
+    <div class="k">Tienes una invitación</div>
+    <div class="pre" style="margin-top:12px">Mi Primera Comunión</div>
+    <div class="name">Salomé</div>
+    <div class="date" id="fechaW" style="margin-top:14px"></div>
+    <button class="btnAbrir" id="abrir">Abrir invitación</button>
+    <div class="hint">Activa el sonido de tu celular</div>
+  </div>
+</div>
 
 <!-- ===================== HERO ===================== -->
 <header class="hero">
@@ -257,6 +285,7 @@ const DATOS = {
 const d = new Date(DATOS.fechaISO);
 const fmt = new Intl.DateTimeFormat("es-CO",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:"America/Bogota"});
 document.getElementById("fecha").textContent = fmt.format(d) + " · 1:30 p. m.";
+document.getElementById("fechaW").textContent = fmt.format(d) + " · 1:30 p. m.";
 document.getElementById("lugarNombre").textContent = DATOS.lugar;
 document.getElementById("lugarHora").textContent = fmt.format(d).replace(/^(\w)/,c=>c.toUpperCase()) + " · " + DATOS.hora;
 document.getElementById("lugarDir").textContent = DATOS.direccion;
@@ -291,6 +320,12 @@ musica.volume = 0.6;
 function sonar(){ if(!quiereMusica) return; musica.play().then(()=>btnMusica.classList.add("playing")).catch(()=>{}); }
 function primerToque(){ sonar(); removeEventListener("touchstart", primerToque); removeEventListener("click", primerToque); removeEventListener("scroll", primerToque); }
 addEventListener("touchstart", primerToque, {passive:true}); addEventListener("click", primerToque); addEventListener("scroll", primerToque, {passive:true});
+const welcome = document.getElementById("welcome");
+document.getElementById("abrir").addEventListener("click", () => {
+  quiereMusica = true; sonar();
+  welcome.classList.add("out"); document.body.classList.remove("locked");
+  setTimeout(() => welcome.remove(), 1000); window.scrollTo(0,0);
+});
 btnMusica.addEventListener("click", e => {
   e.stopPropagation();
   if (musica.paused){ quiereMusica = true; sonar(); } else { quiereMusica = false; musica.pause(); btnMusica.classList.remove("playing"); }
