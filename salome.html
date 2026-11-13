@@ -13,14 +13,14 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#3A2A12">
+<meta name="theme-color" content="#432737">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,500&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=Great+Vibes&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --oro:#C9A24B; --oro-claro:#E6CA85; --oro-osc:#A8822F;
-    --cafe:#4A3418; --cafe-osc:#241A0C; --tinta:#3A2A12;
-    --crema:#FBF6EC; --beige:#F3E8D2; --arena:#DEC9A0; --lirio:#9C8A62;
+    --cafe:#6B3A4C; --cafe-osc:#2B1721; --tinta:#432737;
+    --crema:#FCF3F2; --beige:#F8E4E2; --arena:#E6C3C0; --lirio:#B58A93;
     --display:'Fraunces',Georgia,serif; --script:'Great Vibes',cursive;
     --italic:'Cormorant Garamond',Georgia,serif; --body:'Karla',system-ui,sans-serif;
   }
@@ -36,10 +36,10 @@
   .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;
     padding:0 22px 40px;color:var(--crema);background:var(--cafe-osc);overflow:hidden}
   .hero .blur{position:absolute;inset:-40px;background:url(assets/familia-salome.jpg) center/cover no-repeat;filter:blur(24px) brightness(.4);opacity:.9}
-  .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,26,12,0) 34%,rgba(36,26,12,.9) 56%,#241A0C 64%)}
+  .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(43,23,33,0) 34%,rgba(43,23,33,.9) 56%,#2B1721 64%)}
   .hero .foto{position:relative;width:100%;margin:9vh 0 0;animation:paint 2.2s cubic-bezier(.2,.7,.2,1) both}
   .hero .foto img{width:100%;display:block}
-  .hero .foto::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:58%;background:linear-gradient(180deg,rgba(36,26,12,0) 0%,rgba(36,26,12,.85) 60%,#241A0C 100%)}
+  .hero .foto::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:58%;background:linear-gradient(180deg,rgba(43,23,33,0) 0%,rgba(43,23,33,.85) 60%,#2B1721 100%)}
   @keyframes paint{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
   .hero .txt{position:relative;margin-top:-12%}
   .hero .k{color:var(--oro-claro)}
@@ -63,7 +63,7 @@
   .lugar{padding:44px 0 6px}
   .lugar h2{font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.05;color:var(--cafe);margin:8px 0 4px}
   .lugar .t{font-family:var(--italic);font-style:italic;font-size:1.3rem;color:var(--oro-osc)}
-  .lugar p{margin-top:10px;color:#5d4a2c;font-size:.98rem}
+  .lugar p{margin-top:10px;color:#6E4A58;font-size:.98rem}
   .reveal{opacity:0;transform:translateY(16px);transition:opacity .7s,transform .7s}
   .on .reveal{opacity:1;transform:none}
 
@@ -87,7 +87,7 @@
   .rsvp{padding:60px 22px 30px;text-align:center}
   .rsvp h2{font-family:var(--display);font-weight:300;font-size:1.9rem;color:var(--cafe)}
   .rsvp h2 b{font-weight:600;font-style:italic}
-  .rsvp>p{margin:8px auto 0;max-width:34ch;color:#5d4a2c}
+  .rsvp>p{margin:8px auto 0;max-width:34ch;color:#6E4A58}
   .count{display:flex;justify-content:center;gap:18px;margin:26px 0 8px}
   .count div{min-width:58px}
   .count b{display:block;font-family:var(--display);font-weight:600;font-size:2rem;color:var(--cafe);line-height:1}
@@ -111,7 +111,7 @@
   .ok{text-align:center;padding:10px 0}
   .ok h3{font-family:var(--display);font-weight:600;color:var(--cafe);font-size:1.6rem}
   .ok p{margin-top:6px}
-  .parents{margin-top:54px;padding-top:24px;border-top:1px solid var(--arena);font-family:var(--italic);font-style:italic;color:#7a6542;font-size:1.1rem}
+  .parents{margin-top:54px;padding-top:24px;border-top:1px solid var(--arena);font-family:var(--italic);font-style:italic;color:#9A6E7C;font-size:1.1rem}
   .parents b{display:block;font-style:normal;font-family:var(--display);font-weight:600;color:var(--cafe);margin-top:4px}
   footer{padding:24px;text-align:center;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--lirio)}
 
@@ -133,7 +133,7 @@
 <!-- ===================== HERO ===================== -->
 <header class="hero">
   <div class="blur" aria-hidden="true"></div>
-  <div class="foto"><img src="assets/familia-salome.jpg" alt="Salomé con su familia"></div>
+  <div class="foto"><img src="assets/familia-salome.jpg" alt="Salomé"></div>
   <div class="veil" aria-hidden="true"></div>
   <div class="txt">
     <div class="k">Tienes una invitación</div>
@@ -141,7 +141,7 @@
     <div class="name">Salomé</div>
     <div class="ribbon">Romero Peralta</div>
     <div class="date" id="fecha"></div>
-    <svg class="cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 2v20M5 8h14"/><circle cx="12" cy="8" r="3.2" fill="#241A0C"/></svg>
+    <svg class="cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 2v20M5 8h14"/><circle cx="12" cy="8" r="3.2" fill="#2B1721"/></svg>
     <div class="scrollhint">Desliza para ver los detalles ↓</div>
   </div>
 </header>
