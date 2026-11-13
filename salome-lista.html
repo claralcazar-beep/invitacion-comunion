@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Confirmaciones · Salomé</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=Great+Vibes&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--oro:#C9A24B;--oro-claro:#E6CA85;--oro-osc:#A8822F;--cafe:#4A3418;--crema:#FBF6EC;--beige:#F3E8D2;--arena:#DEC9A0;--tinta:#3A2A12;--rojo:#8a3b2a;--verde:#5E7A4C}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Karla,system-ui,sans-serif;background:var(--crema);color:var(--tinta);line-height:1.45}
+  .wrap{width:min(100%,560px);margin:0 auto;padding:20px 16px 80px}
+  h1{font-family:'Great Vibes',cursive;font-weight:400;color:var(--oro-osc);font-size:3rem;line-height:1}
+  .sub{font-family:Fraunces,serif;font-style:italic;font-weight:300;color:#7a6542;margin-top:2px}
+  .k{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--oro-osc);font-weight:700}
+  input,textarea{width:100%;padding:11px 13px;border:1px solid var(--arena);border-radius:12px;background:#fff;font:inherit;font-size:1rem;color:var(--tinta)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:999px;border:1px solid var(--cafe);background:var(--cafe);color:var(--crema);font:inherit;font-weight:700;font-size:.88rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn.ghost{background:transparent;color:var(--cafe)} .btn.sm{padding:8px 12px;font-size:.78rem} .btn[disabled]{opacity:.6}
+  .login{margin-top:36px;background:var(--beige);border-radius:20px;padding:22px}
+  .login .btn{width:100%;margin-top:14px}
+  .err{color:var(--rojo);font-size:.9rem;margin-top:10px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 12px}
+  .stat{background:var(--beige);border-radius:14px;padding:12px 6px;text-align:center}
+  .stat b{display:block;font-family:Fraunces,serif;font-weight:600;font-size:1.4rem;color:var(--cafe);line-height:1.05}
+  .stat small{display:block;margin-top:4px;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--oro-osc);font-weight:700}
+  .stat.total{background:var(--cafe)} .stat.total b{color:var(--oro-claro)} .stat.total small{color:var(--beige)}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+  .chips{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+  .chip{padding:8px 14px;border-radius:999px;border:1px solid var(--arena);background:#fff;font:inherit;font-size:.8rem;font-weight:700;color:var(--cafe);cursor:pointer}
+  .chip.sel{background:var(--cafe);color:var(--crema);border-color:var(--cafe)}
+  .card{background:#fff;border:1px solid var(--arena);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+  .card.no{opacity:.75;background:var(--beige)}
+  .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .name{font-family:Fraunces,serif;font-weight:600;font-size:1.1rem;color:var(--cafe);line-height:1.15}
+  .pill{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--oro-claro);color:var(--cafe);white-space:nowrap}
+  .pill.no{background:var(--arena)}
+  .meta{font-size:.84rem;color:#7a6542;margin-top:5px}
+  .meta a{color:var(--cafe);font-weight:700;text-decoration:none}
+  .quote-msg{font-style:italic;border-left:3px solid var(--oro);padding-left:10px;margin-top:8px}
+  .acts{margin-top:10px;display:flex;gap:14px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+  .lnk{background:transparent;border:0;color:var(--cafe);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
+  .lnk.del{color:var(--rojo);font-weight:400} .lnk.gold{color:var(--oro-osc)}
+  .empty{text-align:center;color:#7a6542;padding:36px 0;font-family:Fraunces,serif;font-style:italic}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .hide{display:none}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--cafe);color:var(--crema);padding:10px 16px;border-radius:999px;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Salomé</h1>
+  <div class="sub">Primera Comunión · sábado 5 de diciembre de 2026 · Finca Jacaranda</div>
+
+  <div class="login" id="login">
+    <div class="k">Clave de acceso</div>
+    <input id="clave" type="password" placeholder="••••••••" autocomplete="current-password" style="margin-top:8px">
+    <button class="btn" id="entrar">Entrar</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <div id="panel" class="hide">
+    <div class="stats" id="stats"></div>
+    <div class="bar">
+      <div class="chips" id="filtro">
+        <button class="chip sel" data-f="si">Asisten</button>
+        <button class="chip" data-f="no">No asisten</button>
+        <button class="chip" data-f="todos">Todos</button>
+      </div>
+      <button class="btn ghost sm" id="pdf">PDF</button>
+      <button class="btn ghost sm" id="refrescar">Actualizar</button>
+    </div>
+    <div id="lista"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+const SUPABASE_URL = "https://valyttwwcrsuwtwhnmez.supabase.co";
+const SUPABASE_KEY = "sb_publishable__flMBX4HygEUQ2C_nVRm4Q_b6olRccY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fecha = iso => new Date(iso).toLocaleString("es-CO",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",timeZone:"America/Bogota"});
+const dig = t => String(t ?? "").replace(/\D/g,"").slice(-10);
+const num = s => +String(s||"").replace(/[^\d]/g,"") || 0;
+function toast(t){ const x=$("toast"); x.textContent=t; x.classList.add("show"); setTimeout(()=>x.classList.remove("show"),1800); }
+
+let clave = sessionStorage.getItem("claveSalome") || "", conf = [], f = "si", editId = null;
+async function rpc(fn, args){ const {data, error} = await sb.rpc(fn, {clave, ...args}); if (error) throw error; return data; }
+
+async function entrar(){
+  clave = $("clave").value.trim(); $("loginErr").textContent = "";
+  $("entrar").disabled = true; $("entrar").textContent = "Verificando…";
+  try {
+    const ok = await rpc("salome_clave_ok", {});
+    if (!ok){ $("loginErr").textContent = "Clave incorrecta. Revisa mayúsculas y minúsculas."; sessionStorage.removeItem("claveSalome"); }
+    else { conf = await rpc("salome_listar", {}) || []; sessionStorage.setItem("claveSalome", clave);
+      $("login").classList.add("hide"); $("panel").classList.remove("hide"); pintar(); }
+  } catch(e){ $("loginErr").textContent = "No se pudo conectar. Revisa que ejecutaste supabase-salome.sql."; console.error(e); }
+  $("entrar").disabled = false; $("entrar").textContent = "Entrar";
+}
+$("entrar").onclick = entrar; $("clave").addEventListener("keydown", e => e.key==="Enter" && entrar());
+if (clave){ $("clave").value = clave; entrar(); }
+
+function pintar(){
+  const si = conf.filter(d=>d.asiste), no = conf.filter(d=>!d.asiste);
+  const ad = si.reduce((a,d)=>a+ +d.adultos,0), ni = si.reduce((a,d)=>a+ +d.ninos,0);
+  $("stats").innerHTML = `
+    <div class="stat total"><b>${ad+ni}</b><small>Personas</small></div>
+    <div class="stat"><b>${ad}</b><small>Adultos</small></div>
+    <div class="stat"><b>${ni}</b><small>Niños</small></div>
+    <div class="stat"><b>${si.length}</b><small>Respuestas</small></div>`;
+  const lista = f==="todos" ? conf : f==="si" ? si : no;
+  $("lista").innerHTML = lista.length ? lista.map(d => {
+    if (editId === d.id) return `<div class="card">
+      <div class="k">Editar confirmación</div>
+      <label class="k" style="margin-top:10px;display:block">Nombre</label><input id="eNombre" value="${esc(d.nombre)}">
+      <label class="k" style="margin-top:8px;display:block">Celular</label><input id="eTel" inputmode="tel" value="${esc(d.telefono||"")}">
+      <label class="k" style="margin-top:8px;display:block">¿Asiste?</label>
+      <div class="seg"><button type="button" class="chip ${d.asiste?"sel":""}" id="eSi">Sí asiste</button><button type="button" class="chip ${d.asiste?"":"sel"}" id="eNo">No asiste</button></div>
+      <div class="grid2">
+        <div><label class="k">Adultos</label><input id="eAd" inputmode="numeric" value="${d.adultos}"></div>
+        <div><label class="k">Niños</label><input id="eNi" inputmode="numeric" value="${d.ninos}"></div></div>
+      <label class="k" style="margin-top:8px;display:block">Mensaje</label><input id="eMsg" value="${esc(d.mensaje||"")}">
+      <div class="acts"><button class="btn sm" data-save="${d.id}">Guardar</button><button class="lnk" data-cancel="1">Cancelar</button></div></div>`;
+    return `<div class="card ${d.asiste?"":"no"}">
+      <div class="row"><div class="name">${esc(d.nombre)}</div>
+        <span class="pill ${d.asiste?"":"no"}">${d.asiste?`${d.adultos} adulto${d.adultos!==1?"s":""} · ${d.ninos} niño${d.ninos!==1?"s":""}`:"No asiste"}</span></div>
+      <div class="meta">${fecha(d.creado_en)}${d.telefono?` · <a href="https://wa.me/57${dig(d.telefono)}" target="_blank" rel="noopener">${esc(d.telefono)}</a>`:""}</div>
+      ${d.mensaje?`<div class="meta quote-msg">${esc(d.mensaje)}</div>`:""}
+      <div class="acts">${d.asiste?`<button class="lnk gold" data-cancelo="${d.id}" data-n="${esc(d.nombre)}">Canceló</button>`:""}<button class="lnk" data-edit="${d.id}">Editar</button><button class="lnk del" data-id="${d.id}" data-n="${esc(d.nombre)}">Eliminar</button></div>
+    </div>`; }).join("") : `<div class="empty">Todavía no hay confirmaciones en esta vista.</div>`;
+}
+$("filtro").onclick = e => { const b=e.target.closest(".chip"); if(!b) return; f=b.dataset.f;
+  $("filtro").querySelectorAll(".chip").forEach(x=>x.classList.toggle("sel",x===b)); pintar(); };
+$("refrescar").onclick = async () => { conf = await rpc("salome_listar", {}) || []; pintar(); toast("Actualizado"); };
+
+$("lista").addEventListener("click", async e => {
+  const cx = e.target.closest("[data-cancelo]");
+  if (cx){ if(!confirm(`${cx.dataset.n} canceló: pasa a "No asisten" con 0 personas y su mensaje se conserva. ¿Continuar?`)) return;
+    const ok = await rpc("salome_guardar",{fila:{id:+cx.dataset.cancelo, asiste:false, adultos:0, ninos:0}});
+    if(!ok){ toast("No se pudo guardar"); return; }
+    const it = conf.find(c=>c.id===+cx.dataset.cancelo); it.asiste=false; it.adultos=0; it.ninos=0; pintar(); toast("Marcado como canceló"); return; }
+  if (e.target.closest("[data-edit]")){ editId = +e.target.closest("[data-edit]").dataset.edit; pintar(); return; }
+  if (e.target.closest("[data-cancel]")){ editId = null; pintar(); return; }
+  if (e.target.id === "eSi" || e.target.id === "eNo"){ $("eSi").classList.toggle("sel", e.target.id==="eSi"); $("eNo").classList.toggle("sel", e.target.id==="eNo"); return; }
+  const sv = e.target.closest("[data-save]");
+  if (sv){ const it = conf.find(c=>c.id===+sv.dataset.save);
+    const fila = { id: it.id, nombre: $("eNombre").value.trim(), telefono: $("eTel").value.trim(),
+      asiste: $("eSi").classList.contains("sel"), adultos: num($("eAd").value), ninos: num($("eNi").value), mensaje: $("eMsg").value.trim() };
+    if (fila.nombre.length<2){ $("eNombre").focus(); return; }
+    if (!fila.asiste){ fila.adultos = 0; fila.ninos = 0; }
+    const ok = await rpc("salome_guardar",{fila});
+    if(!ok){ toast("No se pudo guardar"); return; }
+    Object.assign(it, fila, {telefono: fila.telefono||null, mensaje: fila.mensaje||null}); editId = null; pintar(); toast("Guardado"); return; }
+  const b = e.target.closest(".del"); if(!b) return;
+  if(!confirm(`¿Eliminar la confirmación de ${b.dataset.n}? Esta acción no se puede deshacer.`)) return;
+  if(await rpc("salome_eliminar",{fila:+b.dataset.id})){ conf = conf.filter(c=>c.id!==+b.dataset.id); pintar(); toast("Eliminada"); } else toast("No se pudo eliminar");
+});
+
+/* ---------- PDF ---------- */
+$("pdf").onclick = () => {
+  const si = conf.filter(d=>d.asiste), no = conf.filter(d=>!d.asiste);
+  const ad = si.reduce((a,d)=>a+ +d.adultos,0), ni = si.reduce((a,d)=>a+ +d.ninos,0);
+  const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:"mm", format:"a4"});
+  doc.setFillColor(74,52,24); doc.rect(0,0,210,30,"F");
+  doc.setTextColor(230,202,133); doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.text("Primera Comunión · Salomé Romero Peralta", 14, 13);
+  doc.setTextColor(251,246,236); doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text("Sábado 5 de diciembre de 2026 · 1:30 p. m. · Finca Jacaranda, Llanos del Combeima", 14, 20);
+  doc.setTextColor(74,52,24); doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.text("Lista de confirmados", 14, 40);
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(122,101,66);
+  doc.text(`${si.length} respuestas · ${ad} adultos · ${ni} niños · ${ad+ni} personas · ${no.length} no asisten`, 14, 46);
+  const estilo = { headStyles:{fillColor:[74,52,24], textColor:[230,202,133]}, alternateRowStyles:{fillColor:[243,232,210]}, styles:{font:"helvetica", fontSize:8.5, cellPadding:2.2}, margin:{left:14,right:14} };
+  doc.autoTable({ ...estilo, startY:52, head:[["#","Nombre","Celular","Adultos","Niños","Mensaje","Fecha"]],
+    body: si.map((d,k)=>[k+1, d.nombre, d.telefono||"", d.adultos, d.ninos, d.mensaje||"", fecha(d.creado_en)]),
+    columnStyles:{0:{cellWidth:8},3:{halign:"center",cellWidth:16},4:{halign:"center",cellWidth:14},6:{cellWidth:26}} });
+  if (no.length) doc.autoTable({ ...estilo, startY:doc.lastAutoTable.finalY+8, head:[["No asisten","Celular","Mensaje"]], body: no.map(d=>[d.nombre,d.telefono||"",d.mensaje||""]) });
+  const n = doc.internal.getNumberOfPages();
+  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text(`Generado ${new Date().toLocaleDateString("es-CO")} · página ${i} de ${n}`, 14, 290); }
+  doc.save("confirmados-salome.pdf");
+};
+</script>
+</body>
+</html>
